@@ -1,14 +1,16 @@
 package com.epam.esm.utils;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 public class ApplicationValidatorImpl implements ApplicationValidator{
     @Override
     public boolean isNameValid(String name) {
-        return name != null;
+        return name != null && !NumberUtils.isCreatable(name);
     }
 
     @Override
     public boolean isDescriptionValid(String description) {
-        return description != null;
+        return description != null && !NumberUtils.isCreatable(description);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class ApplicationValidatorImpl implements ApplicationValidator{
 
     @Override
     public boolean isEmailValid(String email) {
-        return email != null;
+        return email != null && !NumberUtils.isCreatable(email);
     }
 
     @Override

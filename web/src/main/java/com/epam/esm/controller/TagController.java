@@ -6,7 +6,10 @@ import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -38,11 +41,12 @@ public class TagController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestBody TagRequestDto tagRequestDto) {
-        new BaseResponse(HttpStatus.CREATED.value(), "success", tagService.create(tagRequestDto));
+    public ResponseEntity<?> create(@Valid @RequestBody TagRequestDto tagRequestDto, BindingResult bindingResult) {
+        BaseResponse success =
+                new BaseResponse(HttpStatus.CREATED.value(), "success", tagService.create(tagRequestDto, bindingResult));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(tagService.create(tagRequestDto));
+                .body(success);
     }
 
     @DeleteMapping("/{id}")

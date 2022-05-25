@@ -1,6 +1,7 @@
 package com.epam.esm.dto;
 
 import com.epam.esm.entity.TagEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GiftCertificateRequestDto {
     @NotBlank(message = "name can't be null or blank")
     private String name;
@@ -25,5 +27,5 @@ public class GiftCertificateRequestDto {
     private BigDecimal price;
     @Positive(message = "duration should be more than 0")
     private Integer duration;
-    private List<TagEntity> tagEntities;
+    private List<TagEntity> tags;
 }

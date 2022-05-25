@@ -4,11 +4,16 @@ import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.repository.AppUserRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class AppUserRepositoryImpl implements AppUserRepository {
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
     public AppUserEntity create(AppUserEntity obj) {
         return null;
@@ -21,7 +26,7 @@ public class AppUserRepositoryImpl implements AppUserRepository {
 
     @Override
     public AppUserEntity findById(Long aLong) {
-        return null;
+        return entityManager.find(AppUserEntity.class, aLong);
     }
 
     @Override

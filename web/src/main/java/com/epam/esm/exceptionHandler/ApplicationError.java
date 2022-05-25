@@ -9,7 +9,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ApplicationError extends RuntimeException{
+public class ApplicationError{
     private int status;
     private String message;
+    private Object param;
+
+    public ApplicationError(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }

@@ -4,14 +4,19 @@ import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
     public OrderEntity create(OrderEntity obj) {
-        return null;
+        return entityManager.merge(obj);
     }
 
     @Override
@@ -21,16 +26,18 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public OrderEntity findById(Long aLong) {
-        return null;
+        return entityManager.find(OrderEntity.class, aLong);
     }
 
     @Override
     public OrderEntity update(OrderEntity obj) {
-        return null;
+        return entityManager.merge(obj);
     }
 
     @Override
     public int delete(Long aLong) {
-        return 0;
+        return entityManager.createQuery("delete from OrderEntity where id = :id")
+                .setParameter("id", aLong)
+                .executeUpdate();
     }
 }
