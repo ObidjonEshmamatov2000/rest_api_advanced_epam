@@ -13,6 +13,7 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.utils.ApplicationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -38,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderEntity create(OrderRequestDto orderRequestDto, BindingResult bindingResult) {
         OrderEntity order;
@@ -76,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
                 new ApplicationNotFoundException("order not found with given id", id));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(Long id) {
         if (!validator.isNumberValid(id)) {

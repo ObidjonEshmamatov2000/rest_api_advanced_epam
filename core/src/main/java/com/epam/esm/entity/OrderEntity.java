@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
