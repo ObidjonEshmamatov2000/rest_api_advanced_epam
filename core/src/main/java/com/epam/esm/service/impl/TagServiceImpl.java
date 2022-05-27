@@ -76,4 +76,9 @@ public class TagServiceImpl implements TagService {
     public List<TagEntity> getAll() {
         return repository.getAll(1, 1);
     }
+
+    @Override
+    public List<TagEntity> getTagsByName(String name) {
+        return repository.findByName(name);
+    }
 }

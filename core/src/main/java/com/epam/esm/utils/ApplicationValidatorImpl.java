@@ -5,12 +5,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 public class ApplicationValidatorImpl implements ApplicationValidator{
     @Override
     public boolean isNameValid(String name) {
-        return name != null && !NumberUtils.isCreatable(name);
+        return name!= null && name.trim().length() > 2 && !NumberUtils.isCreatable(name);
     }
 
     @Override
     public boolean isDescriptionValid(String description) {
-        return description != null && !NumberUtils.isCreatable(description);
+        return description != null && description.trim().length() > 2;
     }
 
     @Override

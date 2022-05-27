@@ -23,7 +23,9 @@ public class GiftCertificateController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<?> getAll(
+
+    ) {
         BaseResponse success =
                 new BaseResponse(HttpStatus.OK.value(), "success", null);
         return ResponseEntity
@@ -41,7 +43,11 @@ public class GiftCertificateController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody GiftCertificateRequestDto request, BindingResult bindingResult) {
+    public ResponseEntity<?> create(
+            @Valid
+            @RequestBody GiftCertificateRequestDto request,
+            BindingResult bindingResult
+    ) {
         BaseResponse success =
                 new BaseResponse(HttpStatus.CREATED.value(), "success", service.create(request, bindingResult));
         return ResponseEntity
@@ -49,24 +55,24 @@ public class GiftCertificateController {
                 .body(success);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        service.delete(id);
-        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), "success");
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> update(
+            @Valid
+            @RequestBody GiftCertificateRequestDto request,
+            BindingResult bindingResult,
+            @PathVariable(value = "id") Long id
+    ) {
+        BaseResponse success =
+                new BaseResponse(HttpStatus.OK.value(), "success", service.update(request, id, bindingResult));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(
-            @Valid
-            @RequestBody GiftCertificateRequestDto request,
-            @PathVariable(value = "id") Long id,
-            BindingResult bindingResult
-    ) {
-        BaseResponse success =
-                new BaseResponse(HttpStatus.OK.value(), "success", service.update(request, id, bindingResult));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        service.delete(id);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), "success");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);

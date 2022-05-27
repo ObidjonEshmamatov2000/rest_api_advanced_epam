@@ -25,7 +25,6 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @DecimalMin(value = "0.00", message = "The cost should be positive.")
     private BigDecimal cost;
 
     @Column(name = "create_date")

@@ -45,6 +45,6 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public BaseResponse serverError(Exception e) {
-        return new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getLocalizedMessage());
+        return new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "star " + e.getLocalizedMessage());
     }
 }
