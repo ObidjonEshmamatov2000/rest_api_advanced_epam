@@ -2,12 +2,13 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
@@ -50,6 +51,53 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         String query = "select gc from GiftCertificateEntity gc where gc.name =: name";
         return entityManager.createQuery(query, GiftCertificateEntity.class)
                 .setParameter("name", name)
+                .getResultList();
+    }
+
+    @Override
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByName(String name, Map<String, Integer> paginationParam, String sortingString) {
+        String query = "select gc from GiftCertificateEntity gc where gc.name like CONCAT('%', ?1, '%')";
+        return entityManager.createQuery(
+                        buildSortingQuery(query, sortingString),
+                        GiftCertificateEntity.class
+                )
+                .setParameter(1, name)
+                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
+                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .getResultList();
+    }
+
+    private String buildSortingQuery(String query, String sortingString) {
+        return sortingString.isEmpty() ? query : query + " order by" + sortingString;
+    }
+
+    @Override
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByDescription(String description, Map<String, Integer> paginationParam, String sortingString) {
+        String query = "select gc from GiftCertificateEntity gc where gc.description like CONCAT('%', ?1, '%')";
+        return entityManager.createQuery(
+                buildSortingQuery(query, sortingString),
+                GiftCertificateEntity.class
+        )
+                .setParameter(1, description)
+                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
+                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .getResultList();
+    }
+
+    @Override
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(List<String> tagNameList, Map<String, Integer> paginationParam, String sortingString) {
+        return null;
+    }
+
+    @Override
+    public List<GiftCertificateEntity> findAllFilteredAndSorted(Map<String, Integer> paginationParam, String sortingString) {
+        String query = "select gc from GiftCertificateEntity gc";
+        return entityManager.createQuery(
+                        buildSortingQuery(query, sortingString),
+                        GiftCertificateEntity.class
+                )
+                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
+                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
                 .getResultList();
     }
 }

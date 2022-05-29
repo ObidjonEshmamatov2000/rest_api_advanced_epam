@@ -21,7 +21,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.epam.esm.utils.ParamsStringProvider.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -31,7 +34,12 @@ public class OrderServiceImpl implements OrderService {
     private final GiftCertificateService giftCertificateService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, ApplicationValidator validator, AppUserService appUserService, GiftCertificateService giftCertificateService) {
+    public OrderServiceImpl(
+            OrderRepository repository,
+            ApplicationValidator validator,
+            AppUserService appUserService,
+            GiftCertificateService giftCertificateService
+    ) {
         this.repository = repository;
         this.validator = validator;
         this.appUserService = appUserService;
@@ -44,13 +52,11 @@ public class OrderServiceImpl implements OrderService {
     public OrderEntity create(OrderRequestDto orderRequestDto, BindingResult bindingResult) {
         OrderEntity order;
         AppUserEntity appUserEntity = appUserService.getUserById(orderRequestDto.getUserId());
-
         List<GiftCertificateEntity> giftCertificateEntities = new ArrayList<>();
         orderRequestDto.getCertificateIds().forEach(id ->
                 giftCertificateEntities.add(giftCertificateService.get(id)));
-
         if (giftCertificateEntities.isEmpty()) {
-            throw new ApplicationNotValidDataException("no gift certificate is selected", orderRequestDto);
+            throw new ApplicationNotValidDataException(NO_CERTIFICATE_SELECTED_TO_ORDER, orderRequestDto);
         } else {
             order = new OrderEntity(
                     findTotalOrderCost(giftCertificateEntities),
@@ -72,23 +78,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderEntity get(Long id) {
         if (!validator.isNumberValid(id)) {
-            throw new ApplicationNotValidDataException("order id is not valid", id);
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
         return Optional.ofNullable(repository.findById(id)).orElseThrow(() ->
-                new ApplicationNotFoundException("order not found with given id", id));
+                new ApplicationNotFoundException(ORDER_NOT_FOUND, id));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(Long id) {
         if (!validator.isNumberValid(id)) {
-            throw new ApplicationNotValidDataException("order id is not valid", id);
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
         repository.delete(id);
     }
 
     @Override
-    public List<OrderEntity> getAll() {
+    public List<OrderEntity> getAll(Map<String, Object> params) {
         return null;
     }
 

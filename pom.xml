@@ -5,7 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
-        <module>application</module>
+        <module>web</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -1,4 +1,4 @@
-package com.epam.esm.configuration;
+package com.epam.esm;
 
 import com.epam.esm.config.ModelConfig;
 import org.springframework.boot.SpringApplication;
@@ -11,8 +11,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EntityScan(basePackages = {"com.epam.esm.entity"})
 @Import({ModelConfig.class})
-public class RestApiAdvancedApplication {
+public class AdvancedRestApiApplication {
     public static void main(String[] args) {
-        SpringApplication.run(RestApiAdvancedApplication.class, args);
+        SpringApplication.run(AdvancedRestApiApplication.class, args);
     }
 }

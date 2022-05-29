@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.utils.ParamsStringProvider.ID_NOT_VALID;
+import static com.epam.esm.utils.ParamsStringProvider.USER_NOT_FOUND;
+
 @Service
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserRepository repository;
@@ -31,9 +34,9 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUserEntity getUserById(Long id) {
         if (!validator.isNumberValid(id)) {
-            throw new ApplicationNotValidDataException("user id is not valid", id);
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
         return Optional.ofNullable(repository.findById(id)).orElseThrow(() ->
-                new ApplicationNotFoundException("user not found with given id", id));
+                new ApplicationNotFoundException(USER_NOT_FOUND, id));
     }
 }
