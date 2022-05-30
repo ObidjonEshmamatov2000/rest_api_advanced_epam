@@ -7,7 +7,10 @@ public final class ParamsStringProvider {
     public static final String DURATION = "duration";
     public static final String CREATE_DATE = "create_date";
     public static final String LAST_UPDATE_DATE = "last_update_date";
+    public static final String EMAIL = "email";
+    public static final String USER_ID = "userId";
 
+    public static final String CERTIFICATE_ID = "giftCertificateId";
     public static final String TAG_NAMES = "tagNames";
     public static final String SORT_PARAMS = "sortParams";
     public static final String LIMIT = "limit";

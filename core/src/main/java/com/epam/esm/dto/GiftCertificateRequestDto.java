@@ -35,5 +35,5 @@ public class GiftCertificateRequestDto {
     @Positive(message = "duration should be more than 0")
     private Integer duration;
 
-    private Set<TagRequestDto> tags; // use tag dto
+    private Set<TagRequestDto> tags;
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TagService extends BaseService<TagEntity, TagRequestDto> {
     List<TagEntity> getTagsByName(String name);
+
+    List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders();
 }

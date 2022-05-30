@@ -1,15 +1,19 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
+@EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,7 +21,8 @@ import java.util.List;
 @Entity
 @Table(name = "app_user")
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
-public class AppUserEntity {
+public class AppUserEntity extends RepresentationModel<AppUserEntity> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,4 +39,20 @@ public class AppUserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIgnore
     List<OrderEntity> orders;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AppUserEntity that = (AppUserEntity) o;
+        return Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), firstName, lastName, email);
+    }
 }

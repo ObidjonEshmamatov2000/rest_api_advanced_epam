@@ -1,14 +1,20 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.service.AppUserService;
 import com.epam.esm.util.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.epam.esm.utils.ParamsStringProvider.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,17 +28,36 @@ public class AppUserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") long id) {
-        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), "success", service.getUserById(id));
+        AppUserEntity userById = service.getUserById(id);
+        addLinks(userById);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, userById);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllUsers() {
-        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), "success", service.getAllUsers());
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset
+    ) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(NAME, name);
+        params.put(EMAIL, email);
+        params.put(LIMIT, limit);
+        params.put(OFFSET, offset);
+        List<AppUserEntity> allUsers = service.getAllUsers(params);
+        allUsers.forEach(this::addLinks);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, allUsers);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
+    }
+
+    private void addLinks(AppUserEntity appUser) {
+        if (appUser != null)
+            appUser.add(linkTo(methodOn(AppUserController.class).getUserById(appUser.getId())).withSelfRel());
     }
 }

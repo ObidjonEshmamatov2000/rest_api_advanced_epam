@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,19 +8,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
+@EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "orders")
-public class OrderEntity {
+public class OrderEntity extends RepresentationModel<OrderEntity> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,5 +50,20 @@ public class OrderEntity {
         this.createDate = createDate;
         this.certificates = certificates;
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        OrderEntity order = (OrderEntity) o;
+        return Objects.equals(cost, order.cost) &&
+                Objects.equals(certificates, order.certificates);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), cost, certificates);
     }
 }

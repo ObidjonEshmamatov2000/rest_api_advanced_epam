@@ -1,4 +1,8 @@
 package com.epam.esm.entity;
 
-public class AbstractEntity {
+
+import org.springframework.hateoas.RepresentationModel;
+
+public class AbstractEntity extends RepresentationModel<AbstractEntity> {
+
 }

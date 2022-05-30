@@ -68,7 +68,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     private String buildSortingQuery(String query, String sortingString) {
-        return sortingString.isEmpty() ? query : query + " order by" + sortingString;
+        return sortingString.isEmpty() ? query : query + " order by " + sortingString;
     }
 
     @Override
@@ -86,7 +86,29 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(List<String> tagNameList, Map<String, Integer> paginationParam, String sortingString) {
-        return null;
+        String query = "select g FROM GiftCertificateEntity g JOIN FETCH g.tags t";
+        String tagNameQuery = buildTagNameQuery(tagNameList, query);
+        return entityManager.createQuery(
+                        buildSortingQuery(tagNameQuery, sortingString),
+                        GiftCertificateEntity.class
+                )
+                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
+                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .getResultList();
+    }
+
+    //String query = "select gc from GiftCertificateEntity gc inner join TagEntity t on t.id = gc.id where t.name in (' ')";
+    private String buildTagNameQuery(List<String> tagNameList, String query) {
+        StringBuilder tagNameQuery = new StringBuilder(query).append(" where t.name in (");
+        for (int i=0; i<tagNameList.size(); i++) {
+            if (i != 0) {
+                tagNameQuery.append(", ").append("'").append(tagNameList.get(i)).append("'");
+            } else {
+                tagNameQuery.append("'").append(tagNameList.get(i)).append("'");
+            }
+        }
+        tagNameQuery.append(")");
+        return tagNameQuery.toString();
     }
 
     @Override

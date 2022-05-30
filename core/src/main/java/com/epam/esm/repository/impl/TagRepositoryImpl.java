@@ -2,11 +2,15 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
+
+import static com.epam.esm.utils.ParamsStringProvider.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
@@ -51,5 +55,35 @@ public class TagRepositoryImpl implements TagRepository {
         return entityManager.createQuery("select t from TagEntity t where t.name = :name", TagEntity.class)
                 .setParameter("name", name)
                 .getResultList();
+    }
+
+    @Override
+    public List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, Map<String, Integer> paginationParam) {
+        String query = "select t from TagEntity t join fetch t.certificates gc where gc.id = :certificateId";
+        return entityManager.createQuery(
+                query,
+                TagEntity.class
+        )
+                .setParameter("certificateId", Long.valueOf(giftCertificateId))
+                .setFirstResult(paginationParam.get(OFFSET))
+                .setMaxResults(paginationParam.get(LIMIT))
+                .getResultList();
+    }
+
+    @Override
+    public List<TagEntity> getAllTags(Map<String, Integer> paginationParam) {
+        String query = "select t from TagEntity t";
+        return entityManager.createQuery(
+                        query,
+                        TagEntity.class
+                )
+                .setFirstResult(paginationParam.get(OFFSET))
+                .setMaxResults(paginationParam.get(LIMIT))
+                .getResultList();
+    }
+
+    @Override
+    public List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders() {
+        return null;
     }
 }

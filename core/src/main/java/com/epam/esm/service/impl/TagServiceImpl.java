@@ -8,6 +8,7 @@ import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
 import com.epam.esm.utils.ApplicationValidator;
+import com.epam.esm.utils.PaginationProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,12 +28,14 @@ public class TagServiceImpl implements TagService {
     private final TagRepository repository;
     private final ApplicationValidator validator;
     private final ModelMapper modelMapper;
+    private final PaginationProvider paginationProvider;
 
     @Autowired
-    public TagServiceImpl(TagRepository repository, ApplicationValidator validator, ModelMapper modelMapper) {
+    public TagServiceImpl(TagRepository repository, ApplicationValidator validator, ModelMapper modelMapper, PaginationProvider paginationProvider) {
         this.repository = repository;
         this.validator = validator;
         this.modelMapper = modelMapper;
+        this.paginationProvider = paginationProvider;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -76,11 +80,29 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagEntity> getAll(Map<String, Object> params) {
-        return null;
+        List<TagEntity> all;
+        String name = (String) params.get(NAME);
+        Integer giftCertificateId = (Integer) params.get(CERTIFICATE_ID);
+        if (validator.isNameValid(name)) {
+            all = repository.findByName(name);
+        } else if (validator.isNumberValid(giftCertificateId)) {
+            all = repository.findTagsByCertificateId(
+                    giftCertificateId,
+                    paginationProvider.getPaginationParam(params)
+            );
+        } else {
+            all = repository.getAllTags(paginationProvider.getPaginationParam(params));
+        }
+        return all;
     }
 
     @Override
     public List<TagEntity> getTagsByName(String name) {
         return repository.findByName(name);
+    }
+
+    @Override
+    public List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders() {
+        return repository.findMostUsedTagOfUserWithHighestCostOfOrders();
     }
 }

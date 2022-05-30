@@ -1,9 +1,9 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateRequestDto;
+import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.BaseResponse;
-import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/gift_certificates")
@@ -44,8 +47,9 @@ public class GiftCertificateController {
         params.put(LIMIT, limit);
         params.put(OFFSET, offset);
 
-        BaseResponse success =
-                new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, service.getAll(params));
+        List<GiftCertificateEntity> entities = service.getAll(params);
+        entities.forEach(this::addLinks);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entities);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
@@ -53,8 +57,9 @@ public class GiftCertificateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        BaseResponse success =
-                new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, service.get(id));
+        GiftCertificateEntity entity = service.get(id);
+        addLinks(entity);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entity);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
@@ -66,8 +71,9 @@ public class GiftCertificateController {
             @RequestBody GiftCertificateRequestDto request,
             BindingResult bindingResult
     ) {
-        BaseResponse success =
-                new BaseResponse(HttpStatus.CREATED.value(), SUCCESS_MESSAGE, service.create(request, bindingResult));
+        GiftCertificateEntity entity = service.create(request, bindingResult);
+        addLinks(entity);
+        BaseResponse success = new BaseResponse(HttpStatus.CREATED.value(), SUCCESS_MESSAGE, entity);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(success);
@@ -80,8 +86,9 @@ public class GiftCertificateController {
             BindingResult bindingResult,
             @PathVariable(value = "id") Long id
     ) {
-        BaseResponse success =
-                new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, service.update(request, id, bindingResult));
+        GiftCertificateEntity update = service.update(request, id, bindingResult);
+        addLinks(update);
+        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, update);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
@@ -94,5 +101,18 @@ public class GiftCertificateController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
+    }
+
+    private void addLinks(GiftCertificateEntity giftCertificate) {
+        if (giftCertificate != null) {
+            giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+                    .getById(giftCertificate.getId())).withSelfRel());
+            if (giftCertificate.getTags() != null) {
+                giftCertificate.getTags().forEach(tag ->
+                        tag.add(linkTo(methodOn(TagController.class).get(tag.getId())).withSelfRel()));
+            }
+        }
+
+
     }
 }

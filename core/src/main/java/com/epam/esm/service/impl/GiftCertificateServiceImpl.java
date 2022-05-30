@@ -197,7 +197,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 if (!tagsByName.isEmpty()) {
                     tagEntities.add(tagsByName.get(0));
                 } else {
-                    tagEntities.add(new TagEntity(null, tag.getName(), getCurrentTime()));
+                    tagEntities.add(new TagEntity(tag.getName(), getCurrentTime(), null));
                 }
             });
         }

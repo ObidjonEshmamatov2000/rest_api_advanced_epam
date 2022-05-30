@@ -6,29 +6,49 @@ import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.repository.AppUserRepository;
 import com.epam.esm.service.AppUserService;
 import com.epam.esm.utils.ApplicationValidator;
+import com.epam.esm.utils.PaginationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import static com.epam.esm.utils.ParamsStringProvider.ID_NOT_VALID;
-import static com.epam.esm.utils.ParamsStringProvider.USER_NOT_FOUND;
+import static com.epam.esm.utils.ParamsStringProvider.*;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserRepository repository;
     private final ApplicationValidator validator;
+    private final PaginationProvider paginationProvider;
 
     @Autowired
-    public AppUserServiceImpl(AppUserRepository repository, ApplicationValidator validator) {
+    public AppUserServiceImpl(AppUserRepository repository, ApplicationValidator validator, PaginationProvider paginationProvider) {
         this.repository = repository;
         this.validator = validator;
+        this.paginationProvider = paginationProvider;
     }
 
     @Override
-    public List<AppUserEntity> getAllUsers() {
-        return null;
+    public List<AppUserEntity> getAllUsers(Map<String, Object> params) {
+        List<AppUserEntity> all;
+        String name = (String) params.get(NAME);
+        String email = (String) params.get(EMAIL);
+
+        if (validator.isNameValid(name)) {
+            all = repository.getAllUsersByName(
+                    name,
+                    paginationProvider.getPaginationParam(params)
+            );
+        } else if (validator.isNameValid(email)) {
+            all = repository.getAllUsersByEmail(
+                    email,
+                    paginationProvider.getPaginationParam(params)
+            );
+        } else {
+            all = repository.getAllUsers(paginationProvider.getPaginationParam(params));
+        }
+        return all;
     }
 
     @Override

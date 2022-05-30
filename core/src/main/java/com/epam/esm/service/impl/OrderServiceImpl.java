@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.OrderRequestDto;
+import com.epam.esm.dto.OrderResponseDto;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.entity.OrderEntity;
@@ -11,6 +12,7 @@ import com.epam.esm.service.AppUserService;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.utils.ApplicationValidator;
+import com.epam.esm.utils.PaginationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +34,20 @@ public class OrderServiceImpl implements OrderService {
     private final ApplicationValidator validator;
     private final AppUserService appUserService;
     private final GiftCertificateService giftCertificateService;
+    private final PaginationProvider paginationProvider;
 
     @Autowired
     public OrderServiceImpl(
             OrderRepository repository,
             ApplicationValidator validator,
             AppUserService appUserService,
-            GiftCertificateService giftCertificateService
-    ) {
+            GiftCertificateService giftCertificateService,
+            PaginationProvider paginationProvider) {
         this.repository = repository;
         this.validator = validator;
         this.appUserService = appUserService;
         this.giftCertificateService = giftCertificateService;
+        this.paginationProvider = paginationProvider;
     }
 
 
@@ -95,10 +99,34 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderEntity> getAll(Map<String, Object> params) {
-        return null;
+        List<OrderEntity> all;
+        Integer userId = (Integer) params.get(USER_ID);
+        if (validator.isNumberValid(userId)) {
+            all = repository.getAllOrdersByUserId(
+                    userId,
+                    paginationProvider.getPaginationParam(params)
+            );
+        } else {
+            all = repository.getAllOrders(paginationProvider.getPaginationParam(params));
+        }
+        return all;
     }
 
     private LocalDateTime getCurrentTime() {
         return LocalDateTime.now(ZoneId.systemDefault());
+    }
+
+    @Override
+    public OrderResponseDto getUserOrder(Integer userID, Integer orderId) {
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        if (!validator.isNumberValid(userID) || !validator.isNumberValid(orderId)) {
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, userID);
+        }
+        List<OrderEntity> userOrder = repository.getUserOrder(userID, orderId);
+        if (!userOrder.isEmpty()) {
+            orderResponseDto.setCost(userOrder.get(0).getCost());
+            orderResponseDto.setCreateDate(userOrder.get(0).getCreateDate());
+        }
+        return orderResponseDto;
     }
 }
