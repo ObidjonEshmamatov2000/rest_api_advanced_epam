@@ -3,7 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.dto.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.BaseResponse;
+import com.epam.esm.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,12 @@ import java.util.Map;
 import static com.epam.esm.utils.ParamsStringProvider.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
 
 @RestController
 @RequestMapping("/api/gift_certificates")
@@ -47,7 +53,7 @@ public class GiftCertificateController {
         params.put(LIMIT, limit);
         params.put(OFFSET, offset);
 
-        List<GiftCertificateEntity> entities = service.getAll(params);
+        List<GiftCertificateEntity> entities = service.findAll(params);
         entities.forEach(this::addLinks);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entities);
         return ResponseEntity
@@ -57,7 +63,7 @@ public class GiftCertificateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        GiftCertificateEntity entity = service.get(id);
+        GiftCertificateEntity entity = service.findById(id);
         addLinks(entity);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entity);
         return ResponseEntity
@@ -96,7 +102,7 @@ public class GiftCertificateController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        service.delete(id);
+        service.deleteById(id);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -112,7 +118,5 @@ public class GiftCertificateController {
                         tag.add(linkTo(methodOn(TagController.class).get(tag.getId())).withSelfRel()));
             }
         }
-
-
     }
 }

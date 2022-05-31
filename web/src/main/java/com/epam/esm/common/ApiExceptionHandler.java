@@ -1,10 +1,9 @@
-package com.epam.esm.exceptionHandler;
+package com.epam.esm.common;
 
 import com.epam.esm.exception.ApplicationDuplicateDataException;
 import com.epam.esm.exception.ApplicationNotFoundException;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.exception.BaseException;
-import com.epam.esm.util.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,9 +11,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @EnableWebMvc
 @RestControllerAdvice
-public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

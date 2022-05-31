@@ -16,6 +16,12 @@ import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @Service
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserRepository repository;
@@ -23,36 +29,40 @@ public class AppUserServiceImpl implements AppUserService {
     private final PaginationProvider paginationProvider;
 
     @Autowired
-    public AppUserServiceImpl(AppUserRepository repository, ApplicationValidator validator, PaginationProvider paginationProvider) {
+    public AppUserServiceImpl(
+            AppUserRepository repository,
+            ApplicationValidator validator,
+            PaginationProvider paginationProvider
+    ) {
         this.repository = repository;
         this.validator = validator;
         this.paginationProvider = paginationProvider;
     }
 
     @Override
-    public List<AppUserEntity> getAllUsers(Map<String, Object> params) {
+    public List<AppUserEntity> findAllUsers(Map<String, Object> params) {
         List<AppUserEntity> all;
         String name = (String) params.get(NAME);
         String email = (String) params.get(EMAIL);
 
         if (validator.isNameValid(name)) {
-            all = repository.getAllUsersByName(
+            all = repository.findAllUsersByName(
                     name,
                     paginationProvider.getPaginationParam(params)
             );
         } else if (validator.isNameValid(email)) {
-            all = repository.getAllUsersByEmail(
+            all = repository.findAllUsersByEmail(
                     email,
                     paginationProvider.getPaginationParam(params)
             );
         } else {
-            all = repository.getAllUsers(paginationProvider.getPaginationParam(params));
+            all = repository.findAll(paginationProvider.getPaginationParam(params));
         }
         return all;
     }
 
     @Override
-    public AppUserEntity getUserById(Long id) {
+    public AppUserEntity findUserById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }

@@ -16,12 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -31,7 +36,11 @@ public class TagServiceImpl implements TagService {
     private final PaginationProvider paginationProvider;
 
     @Autowired
-    public TagServiceImpl(TagRepository repository, ApplicationValidator validator, ModelMapper modelMapper, PaginationProvider paginationProvider) {
+    public TagServiceImpl(
+            TagRepository repository,
+            ApplicationValidator validator,
+            ModelMapper modelMapper,
+            PaginationProvider paginationProvider) {
         this.repository = repository;
         this.validator = validator;
         this.modelMapper = modelMapper;
@@ -43,7 +52,7 @@ public class TagServiceImpl implements TagService {
     public TagEntity create(TagRequestDto tagRequestDto, BindingResult bindingResult) {
         checkIfModelValid(tagRequestDto, bindingResult);
         TagEntity map = modelMapper.map(tagRequestDto, TagEntity.class);
-        return repository.create(map);
+        return repository.merge(map);
     }
 
     public void checkIfModelValid(TagRequestDto request, BindingResult bindingResult) {
@@ -61,7 +70,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagEntity get(Long id) {
+    public TagEntity findById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
@@ -71,15 +80,15 @@ public class TagServiceImpl implements TagService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
     @Override
-    public List<TagEntity> getAll(Map<String, Object> params) {
+    public List<TagEntity> findAll(Map<String, Object> params) {
         List<TagEntity> all;
         String name = (String) params.get(NAME);
         Integer giftCertificateId = (Integer) params.get(CERTIFICATE_ID);
@@ -91,13 +100,13 @@ public class TagServiceImpl implements TagService {
                     paginationProvider.getPaginationParam(params)
             );
         } else {
-            all = repository.getAllTags(paginationProvider.getPaginationParam(params));
+            all = repository.findAll(paginationProvider.getPaginationParam(params));
         }
         return all;
     }
 
     @Override
-    public List<TagEntity> getTagsByName(String name) {
+    public List<TagEntity> findTagsByName(String name) {
         return repository.findByName(name);
     }
 

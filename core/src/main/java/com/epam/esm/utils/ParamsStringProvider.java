@@ -1,5 +1,11 @@
 package com.epam.esm.utils;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 public final class ParamsStringProvider {
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";

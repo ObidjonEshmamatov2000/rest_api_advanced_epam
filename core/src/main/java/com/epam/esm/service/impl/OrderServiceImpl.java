@@ -28,6 +28,12 @@ import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
@@ -55,10 +61,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderEntity create(OrderRequestDto orderRequestDto, BindingResult bindingResult) {
         OrderEntity order;
-        AppUserEntity appUserEntity = appUserService.getUserById(orderRequestDto.getUserId());
+        AppUserEntity appUserEntity = appUserService.findUserById(orderRequestDto.getUserId());
         List<GiftCertificateEntity> giftCertificateEntities = new ArrayList<>();
         orderRequestDto.getCertificateIds().forEach(id ->
-                giftCertificateEntities.add(giftCertificateService.get(id)));
+                giftCertificateEntities.add(giftCertificateService.findById(id)));
         if (giftCertificateEntities.isEmpty()) {
             throw new ApplicationNotValidDataException(NO_CERTIFICATE_SELECTED_TO_ORDER, orderRequestDto);
         } else {
@@ -68,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
                     giftCertificateEntities,
                     appUserEntity);
         }
-        return repository.create(order);
+        return repository.merge(order);
     }
 
     private BigDecimal findTotalOrderCost(List<GiftCertificateEntity> giftCertificateEntities) {
@@ -80,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderEntity get(Long id) {
+    public OrderEntity findById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
@@ -90,24 +96,25 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
     @Override
-    public List<OrderEntity> getAll(Map<String, Object> params) {
+    public List<OrderEntity> findAll(Map<String, Object> params) {
         List<OrderEntity> all;
         Integer userId = (Integer) params.get(USER_ID);
         if (validator.isNumberValid(userId)) {
-            all = repository.getAllOrdersByUserId(
+            all = repository.findAllOrdersByUserId(
                     userId,
                     paginationProvider.getPaginationParam(params)
             );
         } else {
-            all = repository.getAllOrders(paginationProvider.getPaginationParam(params));
+            throw new ApplicationNotValidDataException("user id is not valid", userId);
+//            all = repository.findAll(paginationProvider.getPaginationParam(params));
         }
         return all;
     }
@@ -117,12 +124,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDto getUserOrder(Integer userID, Integer orderId) {
+    public OrderResponseDto findSingleUserOrder(Integer userID, Integer orderId) {
         OrderResponseDto orderResponseDto = new OrderResponseDto();
         if (!validator.isNumberValid(userID) || !validator.isNumberValid(orderId)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, userID);
         }
-        List<OrderEntity> userOrder = repository.getUserOrder(userID, orderId);
+        List<OrderEntity> userOrder = repository.findSingleUserOrder(userID, orderId);
         if (!userOrder.isEmpty()) {
             orderResponseDto.setCost(userOrder.get(0).getCost());
             orderResponseDto.setCreateDate(userOrder.get(0).getCreateDate());

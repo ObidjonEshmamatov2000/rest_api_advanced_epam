@@ -8,10 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
-
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
 
 @EntityListeners(AuditListener.class)
 @AllArgsConstructor
@@ -22,7 +27,6 @@ import java.util.Objects;
 @Table(name = "app_user")
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class AppUserEntity extends RepresentationModel<AppUserEntity> {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,7 +42,7 @@ public class AppUserEntity extends RepresentationModel<AppUserEntity> {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIgnore
-    List<OrderEntity> orders;
+    private List<OrderEntity> orders;
 
     @Override
     public boolean equals(Object o) {

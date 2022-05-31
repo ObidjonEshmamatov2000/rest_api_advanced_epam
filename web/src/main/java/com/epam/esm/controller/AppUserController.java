@@ -2,7 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.service.AppUserService;
-import com.epam.esm.util.BaseResponse;
+import com.epam.esm.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,12 @@ import static com.epam.esm.utils.ParamsStringProvider.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @RestController
 @RequestMapping("/api/users")
 public class AppUserController {
@@ -28,7 +34,7 @@ public class AppUserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") long id) {
-        AppUserEntity userById = service.getUserById(id);
+        AppUserEntity userById = service.findUserById(id);
         addLinks(userById);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, userById);
         return ResponseEntity
@@ -48,7 +54,7 @@ public class AppUserController {
         params.put(EMAIL, email);
         params.put(LIMIT, limit);
         params.put(OFFSET, offset);
-        List<AppUserEntity> allUsers = service.getAllUsers(params);
+        List<AppUserEntity> allUsers = service.findAllUsers(params);
         allUsers.forEach(this::addLinks);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, allUsers);
         return ResponseEntity

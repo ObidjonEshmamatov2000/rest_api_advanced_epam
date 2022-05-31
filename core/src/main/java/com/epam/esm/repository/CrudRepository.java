@@ -1,9 +1,12 @@
 package com.epam.esm.repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- *
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
  * @param <T> 'T' is Entity type for CRUD operations
  * @param <Id> Primary key of T (object)
  */
@@ -14,15 +17,14 @@ public interface CrudRepository<T, Id>{
      * @param obj Object to create
      * @return optional id of created object
      */
-    T create(T obj);
+    T merge(T obj);
 
     /**
      * Gets all existing entities with provided type and provided limit and offset.
-     * @param limit limit of entities
-     * @param offset offset for the entities
+     * @param paginationParam limit and offset of entities
      * @return list of entities
      */
-    List<T> getAll(int limit, int offset);
+    List<T> findAll(Map<String, Integer> paginationParam);
 
     /**
      * Gets entity with the provided id.
@@ -32,16 +34,9 @@ public interface CrudRepository<T, Id>{
     T findById(Id id);
 
     /**
-     * Updates provided entity object.
-     * @param obj entity with fields that needed to be updated
-     * @return the number of rows affected
-     */
-    T update(T obj);
-
-    /**
      * Deletes entity with the provided id.
      * @param id id of the object to be deleted
      * @return the number of rows affected
      */
-    int delete(Id id);
+    int deleteById(Id id);
 }

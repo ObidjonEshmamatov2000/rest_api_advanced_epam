@@ -2,6 +2,12 @@ package com.epam.esm.utils;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 public class ApplicationValidatorImpl implements ApplicationValidator{
     @Override
     public boolean isNameValid(String name) {
@@ -26,10 +32,5 @@ public class ApplicationValidatorImpl implements ApplicationValidator{
     @Override
     public boolean isEmailValid(String email) {
         return email != null && !NumberUtils.isCreatable(email);
-    }
-
-    @Override
-    public boolean isParamValid(String param) {
-        return param != null;
     }
 }

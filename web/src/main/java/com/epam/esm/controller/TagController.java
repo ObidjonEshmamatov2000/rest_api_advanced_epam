@@ -3,7 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.dto.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.service.TagService;
-import com.epam.esm.util.BaseResponse;
+import com.epam.esm.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,13 @@ import java.util.Map;
 import static com.epam.esm.utils.ParamsStringProvider.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 
 @RestController
 @RequestMapping("/api/tags")
@@ -43,7 +50,7 @@ public class TagController {
         params.put(LIMIT, limit);
         params.put(OFFSET, offset);
 
-        List<TagEntity> entities = tagService.getAll(params);
+        List<TagEntity> entities = tagService.findAll(params);
         entities.forEach(this::addLinks);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entities);
         return ResponseEntity
@@ -53,7 +60,7 @@ public class TagController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long id) {
-        TagEntity entity = tagService.get(id);
+        TagEntity entity = tagService.findById(id);
         addLinks(entity);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, entity);
         return ResponseEntity
@@ -72,7 +79,10 @@ public class TagController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@Valid @RequestBody TagRequestDto tagRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<?> create(
+            @Valid @RequestBody TagRequestDto tagRequestDto,
+            BindingResult bindingResult
+    ) {
         TagEntity entity = tagService.create(tagRequestDto, bindingResult);
         addLinks(entity);
         BaseResponse success = new BaseResponse(HttpStatus.CREATED.value(), SUCCESS_MESSAGE, entity);
@@ -83,7 +93,7 @@ public class TagController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        tagService.delete(id);
+        tagService.deleteById(id);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE);
         return ResponseEntity
                 .status(HttpStatus.OK)

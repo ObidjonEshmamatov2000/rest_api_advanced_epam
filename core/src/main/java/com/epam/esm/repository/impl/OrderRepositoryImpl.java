@@ -2,7 +2,6 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.repository.OrderRepository;
-import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -10,7 +9,15 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
+import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
@@ -18,13 +25,26 @@ public class OrderRepositoryImpl implements OrderRepository {
     private EntityManager entityManager;
 
     @Override
-    public OrderEntity create(OrderEntity obj) {
+    public OrderEntity merge(OrderEntity obj) {
         return entityManager.merge(obj);
     }
 
     @Override
-    public List<OrderEntity> getAll(int limit, int offset) {
-        return null;
+    public List<OrderEntity> findAll(Map<String, Integer> paginationParam) {
+        String query = "select o from OrderEntity o";
+        return entityManager
+                .createQuery(query,OrderEntity.class)
+                .setFirstResult(paginationParam.get(OFFSET))
+                .setMaxResults(paginationParam.get(LIMIT))
+                .getResultList();
+    }
+
+    @Override
+    public int deleteById(Long aLong) {
+        return entityManager
+                .createQuery("delete from OrderEntity where id = :id")
+                .setParameter("id", aLong)
+                .executeUpdate();
     }
 
     @Override
@@ -33,24 +53,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public OrderEntity update(OrderEntity obj) {
-        return entityManager.merge(obj);
-    }
-
-    @Override
-    public int delete(Long aLong) {
-        return entityManager.createQuery("delete from OrderEntity where id = :id")
-                .setParameter("id", aLong)
-                .executeUpdate();
-    }
-
-    @Override
-    public List<OrderEntity> getAllOrdersByUserId(Integer userId, Map<String, Integer> paginationParam) {
+    public List<OrderEntity> findAllOrdersByUserId(Integer userId, Map<String, Integer> paginationParam) {
         String query = "select o from OrderEntity o join fetch o.user u where u.id = ?1";
-        return entityManager.createQuery(
-                        query,
-                        OrderEntity.class
-                )
+        return entityManager
+                .createQuery(query, OrderEntity.class)
                 .setParameter(1, Long.valueOf(userId))
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
@@ -58,25 +64,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<OrderEntity> getAllOrders(Map<String, Integer> paginationParam) {
-        String query = "select o from OrderEntity o";
-        return entityManager.createQuery(
-                query,
-                OrderEntity.class
-        )
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
-                .getResultList();
-    }
-
-    @Override
-    public List<OrderEntity> getUserOrder(Integer userID, Integer orderId) {
-//        String query2 = "select o from OrderEntity o where o.id = ?1";
+    public List<OrderEntity> findSingleUserOrder(Integer userID, Integer orderId) {
         String query = "select o from OrderEntity o join fetch o.user u where o.id = ?1 and u.id = ?2";
-        return entityManager.createQuery(
-                query,
-                OrderEntity.class
-        )
+        return entityManager
+                .createQuery(query, OrderEntity.class)
                 .setParameter(1, Long.valueOf(orderId))
                 .setParameter(2, Long.valueOf(userID))
                 .getResultList();

@@ -6,6 +6,12 @@ import com.epam.esm.entity.OrderEntity;
 
 import java.util.List;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 public interface OrderService extends BaseService<OrderEntity, OrderRequestDto> {
-    OrderResponseDto getUserOrder(Integer userID, Integer orderId);
+    OrderResponseDto findSingleUserOrder(Integer userID, Integer orderId);
 }

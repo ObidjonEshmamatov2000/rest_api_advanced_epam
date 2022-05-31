@@ -26,6 +26,12 @@ import java.util.*;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
@@ -57,7 +63,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         entity.setCreateDate(getCurrentTime());
         entity.setLastUpdateDate(getCurrentTime());
         entity.setTags(checkIfTagExist(entity.getTags()));
-        return repository.create(entity);
+        return repository.merge(entity);
     }
 
     private void checkIfModelValidForCreating(GiftCertificateRequestDto request, BindingResult bindingResult) {
@@ -74,7 +80,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private Set<TagEntity> checkIfTagExist(Set<TagEntity> tags) {
         Set<TagEntity> tagEntities = new HashSet<>();
         tags.forEach(tag -> {
-            List<TagEntity> tagsByName = tagService.getTagsByName(tag.getName());
+            List<TagEntity> tagsByName = tagService.findTagsByName(tag.getName());
             if (tagsByName.isEmpty()) {
                 tagEntities.add(tag);
             } else {
@@ -85,7 +91,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificateEntity get(Long id) {
+    public GiftCertificateEntity findById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
@@ -95,15 +101,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         if (!validator.isNumberValid(id)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, id);
         }
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
     @Override
-    public List<GiftCertificateEntity> getAll(Map<String, Object> params) {
+    public List<GiftCertificateEntity> findAll(Map<String, Object> params) {
         List<GiftCertificateEntity> all;
         String name = (String) params.get(NAME);
         String description = (String) params.get(DESCRIPTION);
@@ -193,7 +199,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         modelMapper.map(update, old);
         if (updateTags != null && updateTags.size() != 0) {
             updateTags.forEach(tag -> {
-                List<TagEntity> tagsByName = tagService.getTagsByName(tag.getName());
+                List<TagEntity> tagsByName = tagService.findTagsByName(tag.getName());
                 if (!tagsByName.isEmpty()) {
                     tagEntities.add(tagsByName.get(0));
                 } else {
@@ -203,7 +209,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
         old.setTags(tagEntities);
         old.setLastUpdateDate(getCurrentTime());
-        return repository.update(old);
+        return repository.merge(old);
     }
 
     private GiftCertificateEntity checkIfModelValidForUpdatingAndGetOld(

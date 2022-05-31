@@ -12,25 +12,38 @@ import java.util.Map;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 @Repository
 public class TagRepositoryImpl implements TagRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public TagEntity create(TagEntity obj) {
-        entityManager.persist(obj);
-        if (obj.getId() != null)
-            return obj;
-        return null;
+    public TagEntity merge(TagEntity obj) {
+        return entityManager.merge(obj);
     }
 
     @Override
-    public List<TagEntity> getAll(int limit, int offset) {
-        return entityManager.createQuery("select t from TagEntity t", TagEntity.class)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
+    public List<TagEntity> findAll(Map<String, Integer> paginationParam) {
+        String query = "select t from TagEntity t";
+        return entityManager
+                .createQuery(query,TagEntity.class)
+                .setFirstResult(paginationParam.get(OFFSET))
+                .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
+    }
+
+    @Override
+    public int deleteById(Long id) {
+        return entityManager
+                .createQuery("delete from TagEntity where id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
 
     @Override
@@ -39,20 +52,9 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public TagEntity update(TagEntity obj) {
-        return entityManager.merge(obj);
-    }
-
-    @Override
-    public int delete(Long id) {
-        return entityManager.createQuery("delete from TagEntity where id = :id")
-                .setParameter("id", id)
-                .executeUpdate();
-    }
-
-    @Override
     public List<TagEntity> findByName(String name) {
-        return entityManager.createQuery("select t from TagEntity t where t.name = :name", TagEntity.class)
+        return entityManager
+                .createQuery("select t from TagEntity t where t.name = :name", TagEntity.class)
                 .setParameter("name", name)
                 .getResultList();
     }
@@ -60,23 +62,9 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, Map<String, Integer> paginationParam) {
         String query = "select t from TagEntity t join fetch t.certificates gc where gc.id = :certificateId";
-        return entityManager.createQuery(
-                query,
-                TagEntity.class
-        )
+        return entityManager
+                .createQuery(query,TagEntity.class)
                 .setParameter("certificateId", Long.valueOf(giftCertificateId))
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
-                .getResultList();
-    }
-
-    @Override
-    public List<TagEntity> getAllTags(Map<String, Integer> paginationParam) {
-        String query = "select t from TagEntity t";
-        return entityManager.createQuery(
-                        query,
-                        TagEntity.class
-                )
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();

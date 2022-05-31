@@ -6,10 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Set;
+
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
 
 @AllArgsConstructor
 @NoArgsConstructor

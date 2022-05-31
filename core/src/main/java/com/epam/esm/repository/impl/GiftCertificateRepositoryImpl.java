@@ -10,23 +10,38 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
+
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public GiftCertificateEntity create(GiftCertificateEntity obj) {
+    public GiftCertificateEntity merge(GiftCertificateEntity obj) {
         return entityManager.merge(obj);
     }
 
     @Override
-    public List<GiftCertificateEntity> getAll(int limit, int offset) {
+    public List<GiftCertificateEntity> findAll(Map<String, Integer> paginationParam) {
         String query = "select gc from GiftCertificateEntity gc";
-        return entityManager.createQuery(query, GiftCertificateEntity.class)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
+        return entityManager
+                .createQuery(query, GiftCertificateEntity.class)
+                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
+                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
                 .getResultList();
+    }
+
+    @Override
+    public int deleteById(Long aLong) {
+        return entityManager.createQuery("delete from GiftCertificateEntity where id = :id")
+                .setParameter("id", aLong)
+                .executeUpdate();
     }
 
     @Override
@@ -35,32 +50,23 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public GiftCertificateEntity update(GiftCertificateEntity obj) {
-        return entityManager.merge(obj);
-    }
-
-    @Override
-    public int delete(Long aLong) {
-        return entityManager.createQuery("delete from GiftCertificateEntity where id = :id")
-                .setParameter("id", aLong)
-                .executeUpdate();
-    }
-
-    @Override
     public List<GiftCertificateEntity> findByName(String name) {
         String query = "select gc from GiftCertificateEntity gc where gc.name =: name";
-        return entityManager.createQuery(query, GiftCertificateEntity.class)
+        return entityManager
+                .createQuery(query, GiftCertificateEntity.class)
                 .setParameter("name", name)
                 .getResultList();
     }
 
     @Override
-    public List<GiftCertificateEntity> findAllFilteredAndSortedByName(String name, Map<String, Integer> paginationParam, String sortingString) {
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByName(
+            String name,
+            Map<String, Integer> paginationParam,
+            String sortingString
+    ) {
         String query = "select gc from GiftCertificateEntity gc where gc.name like CONCAT('%', ?1, '%')";
-        return entityManager.createQuery(
-                        buildSortingQuery(query, sortingString),
-                        GiftCertificateEntity.class
-                )
+        return entityManager
+                .createQuery(buildSortingQuery(query, sortingString),GiftCertificateEntity.class)
                 .setParameter(1, name)
                 .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
                 .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
@@ -72,12 +78,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificateEntity> findAllFilteredAndSortedByDescription(String description, Map<String, Integer> paginationParam, String sortingString) {
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByDescription(
+            String description,
+            Map<String, Integer> paginationParam,
+            String sortingString
+    ) {
         String query = "select gc from GiftCertificateEntity gc where gc.description like CONCAT('%', ?1, '%')";
-        return entityManager.createQuery(
-                buildSortingQuery(query, sortingString),
-                GiftCertificateEntity.class
-        )
+        return entityManager
+                .createQuery(buildSortingQuery(query, sortingString), GiftCertificateEntity.class)
                 .setParameter(1, description)
                 .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
                 .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
@@ -85,13 +93,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(List<String> tagNameList, Map<String, Integer> paginationParam, String sortingString) {
+    public List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(
+            List<String> tagNameList,
+            Map<String, Integer> paginationParam,
+            String sortingString
+    ) {
         String query = "select g FROM GiftCertificateEntity g JOIN FETCH g.tags t";
         String tagNameQuery = buildTagNameQuery(tagNameList, query);
-        return entityManager.createQuery(
-                        buildSortingQuery(tagNameQuery, sortingString),
-                        GiftCertificateEntity.class
-                )
+        return entityManager
+                .createQuery(buildSortingQuery(tagNameQuery, sortingString), GiftCertificateEntity.class)
                 .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
                 .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
                 .getResultList();
@@ -112,12 +122,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificateEntity> findAllFilteredAndSorted(Map<String, Integer> paginationParam, String sortingString) {
+    public List<GiftCertificateEntity> findAllFilteredAndSorted(
+            Map<String, Integer> paginationParam,
+            String sortingString
+    ) {
         String query = "select gc from GiftCertificateEntity gc";
-        return entityManager.createQuery(
-                        buildSortingQuery(query, sortingString),
-                        GiftCertificateEntity.class
-                )
+        return entityManager
+                .createQuery(buildSortingQuery(query, sortingString), GiftCertificateEntity.class)
                 .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
                 .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
                 .getResultList();

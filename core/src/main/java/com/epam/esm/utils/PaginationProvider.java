@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Obidjon Eshmamatov
+ * @project rest_api_advanced_2
+ * @created 31/05/2022 - 4:46 PM
+ */
+
 public class PaginationProvider {
     private static final int DEFAULT_LIMIT = 25;
     private static final int DEFAULT_OFFSET = 1;
