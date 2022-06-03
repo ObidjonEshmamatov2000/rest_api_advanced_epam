@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements AppUserService {
                     name,
                     paginationProvider.getPaginationParam(params)
             );
-        } else if (validator.isNameValid(email)) {
+        } else if (validator.isEmailValid(email)) {
             all = repository.findAllUsersByEmail(
                     email,
                     paginationProvider.getPaginationParam(params)

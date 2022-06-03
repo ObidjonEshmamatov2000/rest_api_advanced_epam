@@ -50,6 +50,12 @@ public class TagEntity extends RepresentationModel<TagEntity> {
         this.certificates = certificates;
     }
 
+    public TagEntity(long id, String name, LocalDateTime date) {
+        this.id = id;
+        this.name = name;
+        this.createDate = date;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

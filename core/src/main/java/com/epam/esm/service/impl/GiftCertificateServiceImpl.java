@@ -69,7 +69,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private void checkIfModelValidForCreating(GiftCertificateRequestDto request, BindingResult bindingResult) {
         checkIfModelValid(request, bindingResult);
         if (!validator.isNameValid(request.getName()) || !validator.isDescriptionValid(request.getDescription())) {
-            throw new ApplicationNotValidDataException(CERTIFICATE_NAME_OR_DESC_NOT_ACCEPTABLE, request.getName());
+            throw new ApplicationNotValidDataException(CERTIFICATE_NAME_OR_DESC_NOT_ACCEPTABLE, request);
         }
         List<GiftCertificateEntity> byName = repository.findByName(request.getName());
         if (!byName.isEmpty()) {
@@ -79,6 +79,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private Set<TagEntity> checkIfTagExist(Set<TagEntity> tags) {
         Set<TagEntity> tagEntities = new HashSet<>();
+        if (tags == null || tags.size() == 0) return tagEntities;
         tags.forEach(tag -> {
             List<TagEntity> tagsByName = tagService.findTagsByName(tag.getName());
             if (tagsByName.isEmpty()) {
@@ -121,7 +122,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     paginationProvider.getPaginationParam(params),
                     getValidSortingString(params)
             );
-        } else if (validator.isNameValid(description)) {
+        } else if (validator.isDescriptionValid(description)) {
             all = repository.findAllFilteredAndSortedByDescription(
                     description,
                     paginationProvider.getPaginationParam(params),

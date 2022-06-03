@@ -72,6 +72,9 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders() {
-        return null;
+        String query = "select t from TagEntity t";
+        return entityManager
+                .createQuery(query, TagEntity.class)
+                .getResultList();
     }
 }
