@@ -2,7 +2,6 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -10,7 +9,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
+import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -75,9 +75,8 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders() {
-        String query = "select t from TagEntity t";
-        return entityManager
-                .createQuery(query, TagEntity.class)
+        return (List<TagEntity>) entityManager
+                .createStoredProcedureQuery("get_most_widely_used_tag_of_user_with_highest_cost", TagEntity.class)
                 .getResultList();
     }
 }
