@@ -60,7 +60,10 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, Map<String, Integer> paginationParam) {
+    public List<TagEntity> findTagsByCertificateId(
+            Integer giftCertificateId,
+            Map<String, Integer> paginationParam
+    ) {
         String query = "select t from TagEntity t join fetch t.certificates gc where gc.id = :certificateId";
         return entityManager
                 .createQuery(query,TagEntity.class)

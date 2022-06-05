@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 public interface BaseService<T, G> {
-    T create(G g, BindingResult bindingResult);
+    T create(G g);
 
     T findById(Long id);
 

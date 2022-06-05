@@ -51,17 +51,13 @@ public class TagServiceImpl implements TagService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TagEntity create(TagRequestDto tagRequestDto, BindingResult bindingResult) {
-        checkIfModelValid(tagRequestDto, bindingResult);
+    public TagEntity create(TagRequestDto tagRequestDto) {
+        checkIfModelValid(tagRequestDto);
         TagEntity map = modelMapper.map(tagRequestDto, TagEntity.class);
         return repository.merge(map);
     }
 
-    public void checkIfModelValid(TagRequestDto request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            throw new ApplicationNotValidDataException(errors.get(0).getDefaultMessage(), bindingResult.getTarget());
-        }
+    public void checkIfModelValid(TagRequestDto request) {
         if (!validator.isNameValid(request.getName())) {
             throw new ApplicationNotValidDataException(NAME_NOT_VALID, request.getName());
         }
@@ -96,7 +92,7 @@ public class TagServiceImpl implements TagService {
         Integer giftCertificateId = (Integer) params.get(CERTIFICATE_ID);
         if (validator.isNameValid(name)) {
             all = repository.findByName(name);
-        } else if (validator.isNumberValid(giftCertificateId)) {
+        } else if (giftCertificateId != null && validator.isNumberValid(giftCertificateId)) {
             all = repository.findTagsByCertificateId(
                     giftCertificateId,
                     paginationProvider.getPaginationParam(params)

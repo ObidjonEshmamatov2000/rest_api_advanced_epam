@@ -17,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
-import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -117,14 +114,13 @@ class OrderServiceImplTest {
     @Disabled
     void canCreateOrder() {
         //given
-        BindingResult bindingResult = new BeanPropertyBindingResult(orderRequestDto, "order");
         given(appUserService.findUserById(orderRequestDto.getUserId())).willReturn(appUserEntity);
         given(orderRepository.merge(orderEntity)).willReturn(orderEntity);
 
 
 
         //when
-        OrderEntity createdOrder = underTest.create(orderRequestDto, bindingResult);
+        OrderEntity createdOrder = underTest.create(orderRequestDto);
 
         //then
         assertThat(createdOrder).isEqualTo(orderEntity);

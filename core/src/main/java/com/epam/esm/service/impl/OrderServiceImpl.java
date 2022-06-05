@@ -16,7 +16,6 @@ import com.epam.esm.utils.PaginationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -56,10 +55,9 @@ public class OrderServiceImpl implements OrderService {
         this.paginationProvider = paginationProvider;
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderEntity create(OrderRequestDto orderRequestDto, BindingResult bindingResult) {
+    public OrderEntity create(OrderRequestDto orderRequestDto) {
         OrderEntity order;
         AppUserEntity appUserEntity = appUserService.findUserById(orderRequestDto.getUserId());
         List<GiftCertificateEntity> giftCertificateEntities = new ArrayList<>();
@@ -107,14 +105,13 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderEntity> findAll(Map<String, Object> params) {
         List<OrderEntity> all;
         Integer userId = (Integer) params.get(USER_ID);
-        if (validator.isNumberValid(userId)) {
+        if (userId!= null && validator.isNumberValid(userId)) {
             all = repository.findAllOrdersByUserId(
                     userId,
                     paginationProvider.getPaginationParam(params)
             );
         } else {
-            throw new ApplicationNotValidDataException("user id is not valid", userId);
-//            all = repository.findAll(paginationProvider.getPaginationParam(params));
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, "userId");
         }
         return all;
     }

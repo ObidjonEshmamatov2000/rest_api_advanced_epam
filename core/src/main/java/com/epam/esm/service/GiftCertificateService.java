@@ -11,5 +11,5 @@ import org.springframework.validation.BindingResult;
  */
 
 public interface GiftCertificateService extends BaseService<GiftCertificateEntity, GiftCertificateRequestDto> {
-    GiftCertificateEntity update(GiftCertificateRequestDto update, Long certificateId, BindingResult bindingResult);
+    GiftCertificateEntity update(GiftCertificateRequestDto update, Long certificateId);
 }

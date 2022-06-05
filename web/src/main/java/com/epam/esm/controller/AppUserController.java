@@ -46,14 +46,14 @@ public class AppUserController {
     public ResponseEntity<?> getAllUsers(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "email", required = false) String email,
-            @RequestParam(value = "limit", required = false) Integer limit,
-            @RequestParam(value = "offset", required = false) Integer offset
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
         Map<String, Object> params = new HashMap<>();
         params.put(NAME, name);
         params.put(EMAIL, email);
-        params.put(LIMIT, limit);
-        params.put(OFFSET, offset);
+        params.put(PAGE_SIZE, pageSize);
+        params.put(PAGE_NUMBER, pageNumber);
         List<AppUserEntity> allUsers = service.findAllUsers(params);
         allUsers.forEach(this::addLinks);
         BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, allUsers);
@@ -64,6 +64,7 @@ public class AppUserController {
 
     private void addLinks(AppUserEntity appUser) {
         if (appUser != null)
-            appUser.add(linkTo(methodOn(AppUserController.class).getUserById(appUser.getId())).withSelfRel());
+            appUser.add(linkTo(methodOn(AppUserController.class)
+                    .getUserById(appUser.getId())).withSelfRel());
     }
 }

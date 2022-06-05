@@ -14,8 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.internal.InheritingConfiguration;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -114,7 +112,6 @@ class GiftCertificateServiceImplTest {
     @Test
     void canCreateGiftCertificate() {
         //given
-        BindingResult bindingResult = new BeanPropertyBindingResult(giftCertificateRequestDto, "tagRequestDto");
         given(validator.isNameValid(giftCertificateEntity.getName())).willReturn(true);
         given(validator.isDescriptionValid(giftCertificateEntity.getDescription())).willReturn(true);
         given(modelMapper.map(giftCertificateRequestDto, GiftCertificateEntity.class)).willReturn(giftCertificateEntity);
@@ -122,7 +119,7 @@ class GiftCertificateServiceImplTest {
         given(giftCertificateRepository.findByName(giftCertificateRequestDto.getName())).willReturn(new ArrayList<>());
 
         //when
-        GiftCertificateEntity createdEntity = underTest.create(giftCertificateRequestDto, bindingResult);
+        GiftCertificateEntity createdEntity = underTest.create(giftCertificateRequestDto);
 
         //then
         assertThat(createdEntity).isEqualTo(giftCertificateEntity);
@@ -326,8 +323,6 @@ class GiftCertificateServiceImplTest {
         );
 
         long id = 3L;
-        BindingResult bindingResult = new BeanPropertyBindingResult(update, "tagRequestDto");
-
         given(validator.isNumberValid(id)).willReturn(true);
         given(giftCertificateRepository.findById(id)).willReturn(giftCertificateEntity);
         given(modelMapper.getConfiguration()).willReturn(new InheritingConfiguration());
@@ -335,7 +330,7 @@ class GiftCertificateServiceImplTest {
         given(giftCertificateRepository.merge(giftCertificateEntity)).willReturn(giftCertificateEntity);
 
         //when
-        GiftCertificateEntity updatedEntity = underTest.update(update, id, bindingResult);
+        GiftCertificateEntity updatedEntity = underTest.update(update, id);
 
         //then
         assertThat(updatedEntity).isEqualTo(giftCertificateEntity);

@@ -50,7 +50,12 @@ public class OrderEntity extends RepresentationModel<OrderEntity> {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private AppUserEntity user;
 
-    public OrderEntity(BigDecimal cost, LocalDateTime createDate, List<GiftCertificateEntity> certificates, AppUserEntity user) {
+    public OrderEntity(
+            BigDecimal cost,
+            LocalDateTime createDate,
+            List<GiftCertificateEntity> certificates,
+            AppUserEntity user
+    ) {
         this.cost = cost;
         this.createDate = createDate;
         this.certificates = certificates;

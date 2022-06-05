@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.epam.esm.utils.ParamsStringProvider.*;
+
 /**
  * @author Obidjon Eshmamatov
  * @project rest_api_advanced_2
@@ -26,22 +28,22 @@ public class PaginationProvider {
 
     public Map<String, Integer> getPaginationParam(Map<String, Object> params) {
         Map<String, Integer> paginationParams = new HashMap<>();
-        Integer limit = (Integer) params.get("limit");
-        Integer offset = (Integer) params.get("offset");
+        Integer limit = (Integer) params.get(PAGE_SIZE);
+        Integer offset = (Integer) params.get(PAGE_NUMBER);
 
         if (limit == null) {
             limit = DEFAULT_LIMIT;
         } else if (!validator.isNumberValid(limit)) {
-            throw new ApplicationNotValidDataException("the limit param is not valid", limit);
+            throw new ApplicationNotValidDataException(PAGE_SIZE_NOT_VALID_ERROR, limit);
         }
         if (offset == null) {
             offset = DEFAULT_OFFSET;
         } else if (!validator.isNumberValid(offset)) {
-            throw new ApplicationNotValidDataException("the offset param is not valid", offset);
+            throw new ApplicationNotValidDataException(PAGE_NUMBER_NOT_VALID_ERROR, offset);
         }
 
-        paginationParams.put("limit", limit);
-        paginationParams.put("offset", limit * (offset - 1));
+        paginationParams.put(LIMIT, limit);
+        paginationParams.put(OFFSET, limit * (offset - 1));
         return paginationParams;
     }
 }

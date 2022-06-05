@@ -17,17 +17,17 @@ import java.time.ZoneId;
 public class AuditListener {
     @PostRemove
     public void afterDelete(Object obj) {
-        log.info("USER AUDIT -> deleting process, TIME: " + getCurrentTime());
+        log.info("USER AUDIT -> deleting process, TIME: " + getCurrentTime() + " " + obj.getClass());
     }
 
     @PrePersist
     public void beforePersist(Object obj) {
-        log.info("USER AUDIT -> persisting process, TIME: " + getCurrentTime());
+        log.info("USER AUDIT -> persisting process, TIME: " + getCurrentTime() + " " + obj.getClass());
     }
 
     @PreUpdate
     public void beforeUpdate(Object obj) {
-        log.info("USER AUDIT -> updating process, TIME: " + getCurrentTime());
+        log.info("USER AUDIT -> updating process, TIME: " + getCurrentTime() + " " + obj.getClass());
     }
 
     private LocalDateTime getCurrentTime() {

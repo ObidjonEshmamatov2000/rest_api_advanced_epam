@@ -17,8 +17,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -57,8 +55,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public GiftCertificateEntity create(GiftCertificateRequestDto request, BindingResult bindingResult) {
-        checkIfModelValidForCreating(request, bindingResult);
+    public GiftCertificateEntity create(GiftCertificateRequestDto request) {
+        checkIfModelValidForCreating(request);
         GiftCertificateEntity entity = modelMapper.map(request, GiftCertificateEntity.class);
         entity.setCreateDate(getCurrentTime());
         entity.setLastUpdateDate(getCurrentTime());
@@ -66,9 +64,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return repository.merge(entity);
     }
 
-    private void checkIfModelValidForCreating(GiftCertificateRequestDto request, BindingResult bindingResult) {
-        checkIfModelValid(request, bindingResult);
-        if (!validator.isNameValid(request.getName()) || !validator.isDescriptionValid(request.getDescription())) {
+    private void checkIfModelValidForCreating(GiftCertificateRequestDto request) {
+        checkIfModelValid(request);
+        if (!validator.isNameValid(request.getName())
+                || !validator.isDescriptionValid(request.getDescription())
+        ) {
             throw new ApplicationNotValidDataException(CERTIFICATE_NAME_OR_DESC_NOT_ACCEPTABLE, request);
         }
         List<GiftCertificateEntity> byName = repository.findByName(request.getName());
@@ -155,7 +155,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private String getValidSortingString(Map<String, Object> params) {
         StringBuilder builder = new StringBuilder();
-        String sortParams = (String) params.get(SORT_PARAMS);
+        String sortParams = (String) params.get(SORT_PARAMS);  // id desc
         if (sortParams != null) {
             String[] sortArray = sortParams.split(", ");
             for (int i=0; i < sortArray.length; i++) {
@@ -179,7 +179,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         gift_certificate_params.add(CREATE_DATE);
         gift_certificate_params.add(LAST_UPDATE_DATE);
 
-        return validator.isNameValid(sortParam) &&
+        return sortParam != null &&
                 gift_certificate_params.stream().anyMatch(sortParam::contains) &&
                 (sortParam.contains(ASC) || sortParam.contains(DESC));
     }
@@ -188,10 +188,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificateEntity update(
             GiftCertificateRequestDto update,
-            Long certificateId,
-            BindingResult bindingResult
+            Long certificateId
     ) {
-        GiftCertificateEntity old = checkIfModelValidForUpdatingAndGetOld(update, certificateId, bindingResult);
+        GiftCertificateEntity old = checkIfModelValidForUpdatingAndGetOld(update, certificateId);
         Set<TagEntity> tagEntities = old.getTags();
 
         Set<TagRequestDto> updateTags = update.getTags();
@@ -215,13 +214,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private GiftCertificateEntity checkIfModelValidForUpdatingAndGetOld(
             GiftCertificateRequestDto update,
-            Long certificateId,
-            BindingResult bindingResult
+            Long certificateId
     ) {
         if (!validator.isNumberValid(certificateId)) {
             throw new ApplicationNotValidDataException(ID_NOT_VALID, certificateId);
         }
-        checkIfModelValid(update, bindingResult);
+        if (update.getName() != null && !validator.isNameValid(update.getName())) {
+            throw new ApplicationNotValidDataException(NAME_NOT_VALID, update.getName());
+        }
+        if (update.getDescription() != null && !validator.isDescriptionValid(update.getDescription())) {
+            throw new ApplicationNotValidDataException(NAME_NOT_VALID, update.getDescription());
+        }
+        checkIfModelValid(update);
         GiftCertificateEntity old = repository.findById(certificateId);
         if (old == null) {
             throw new ApplicationNotFoundException(GIFT_CERTIFICATE_NOT_FOUND, update);
@@ -229,11 +233,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return old;
     }
 
-    private void checkIfModelValid(GiftCertificateRequestDto request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            throw new ApplicationNotValidDataException(errors.get(0).getDefaultMessage(), bindingResult.getTarget());
-        }
+    private void checkIfModelValid(GiftCertificateRequestDto request) {
         if (request.getTags() != null) {
             request.getTags().forEach(tag -> {
                 if (!validator.isNameValid(tag.getName())) {

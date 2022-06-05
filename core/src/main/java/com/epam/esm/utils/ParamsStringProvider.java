@@ -16,6 +16,8 @@ public final class ParamsStringProvider {
     public static final String EMAIL = "email";
     public static final String USER_ID = "userId";
 
+    public static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_NUMBER = "pageNumber";
     public static final String CERTIFICATE_ID = "giftCertificateId";
     public static final String TAG_NAMES = "tagNames";
     public static final String SORT_PARAMS = "sortParams";
@@ -37,6 +39,13 @@ public final class ParamsStringProvider {
     public static final String ORDER_NOT_FOUND = "order not found";
 
     public static final String TAG_ALREADY_EXIST = "tag already exist with this name";
-    public static final String TAG_NOT_FOUND = "tag already not found";
+    public static final String TAG_NOT_FOUND = "tag not found";
+
+    public static final String PAGE_NUMBER_NOT_VALID_ERROR = "page number param is not valid";
+    public static final String PAGE_SIZE_NOT_VALID_ERROR = "page size param is not valid";
+
+    public static final String JSON_PARSE_ERROR = "json parse error, params has not been entered correctly";
+    public static final String PARAM_TYPE_MISMATCH_ERROR = "json parse error, params does not match";
+    public static final String SERVLET_NOT_COMPLETE_ERROR = "some params is not provided";
 
 }

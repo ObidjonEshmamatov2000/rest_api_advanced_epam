@@ -12,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,13 +69,12 @@ class TagServiceImplTest {
     @Test
     void canCreateTag() {
         //given
-        BindingResult bindingResult = new BeanPropertyBindingResult(tagRequestDto, "tagRequestDto");
         given(validator.isNameValid(tagRequestDto.getName())).willReturn(true);
         given(modelMapper.map(tagRequestDto, TagEntity.class)).willReturn(tagEntity);
         given(tagRepository.merge(tagEntity)).willReturn(tagEntity);
 
         //when
-        TagEntity createdTagEntity = underTest.create(tagRequestDto, bindingResult);
+        TagEntity createdTagEntity = underTest.create(tagRequestDto);
 
         //then
         assertThat(createdTagEntity).isEqualTo(tagEntity);
