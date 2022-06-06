@@ -6,9 +6,15 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
-import static com.epam.esm.utils.ParamsStringProvider.*;
+
+import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
+import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -29,9 +35,12 @@ public class AppUserRepositoryImpl implements AppUserRepository {
 
     @Override
     public List<AppUserEntity> findAll(Map<String, Integer> paginationParam) {
-        String query = "select u from AppUserEntity u";
-        return entityManager
-                .createQuery(query,AppUserEntity.class)
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
+        Root<AppUserEntity> appUserEntityRoot = cq.from(AppUserEntity.class);
+        cq.select(appUserEntityRoot);
+
+        return entityManager.createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
@@ -39,9 +48,12 @@ public class AppUserRepositoryImpl implements AppUserRepository {
 
     @Override
     public int deleteById(Long aLong) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<AppUserEntity> criteriaDelete = cb.createCriteriaDelete(AppUserEntity.class);
+        Root<AppUserEntity> appUserEntityRoot = criteriaDelete.from(AppUserEntity.class);
+        criteriaDelete.where(cb.equal(appUserEntityRoot.get("id"), aLong));
         return entityManager
-                .createQuery("delete from AppUserEntity u where u.id = :id")
-                .setParameter("id", aLong)
+                .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
@@ -52,12 +64,15 @@ public class AppUserRepositoryImpl implements AppUserRepository {
 
     @Override
     public List<AppUserEntity> findAllUsersByName(String name, Map<String, Integer> paginationParam) {
-        String query = "select u from AppUserEntity u " +
-                "where u.firstName like CONCAT('%', ?1, '%') " +
-                "or u.lastName like CONCAT('%', ?1, '%')";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
+        Root<AppUserEntity> entityRoot = cq.from(AppUserEntity.class);
+        cq.select(entityRoot).where(cb.or(
+                                    cb.like(entityRoot.get("firstName"), "%" + name + "%"),
+                                    cb.like(entityRoot.get("lastName"), "%" + name + "%")
+                                ));
         return entityManager
-                .createQuery(query,AppUserEntity.class)
-                .setParameter(1, name)
+                .createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
@@ -65,10 +80,12 @@ public class AppUserRepositoryImpl implements AppUserRepository {
 
     @Override
     public List<AppUserEntity> findAllUsersByEmail(String email, Map<String, Integer> paginationParam) {
-        String query = "select u from AppUserEntity u where u.email like CONCAT('%', ?1, '%')";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
+        Root<AppUserEntity> entityRoot = cq.from(AppUserEntity.class);
+        cq.select(entityRoot).where(cb.like(entityRoot.get("email"), "%" + email + "%"));
         return entityManager
-                .createQuery(query,AppUserEntity.class)
-                .setParameter(1, email)
+                .createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();

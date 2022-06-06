@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +31,11 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<TagEntity> findAll(Map<String, Integer> paginationParam) {
-        String query = "select t from TagEntity t";
-        return entityManager
-                .createQuery(query,TagEntity.class)
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TagEntity> cq = cb.createQuery(TagEntity.class);
+        Root<TagEntity> entityRoot = cq.from(TagEntity.class);
+        cq.select(entityRoot);
+        return entityManager.createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
@@ -40,9 +43,12 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public int deleteById(Long id) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<TagEntity> criteriaDelete = cb.createCriteriaDelete(TagEntity.class);
+        Root<TagEntity> tagEntityRoot = criteriaDelete.from(TagEntity.class);
+        criteriaDelete.where(cb.equal(tagEntityRoot.get("id"), id));
         return entityManager
-                .createQuery("delete from TagEntity where id = :id")
-                .setParameter("id", id)
+                .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
@@ -53,9 +59,12 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<TagEntity> findByName(String name) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TagEntity> cq = cb.createQuery(TagEntity.class);
+        Root<TagEntity> entityRoot = cq.from(TagEntity.class);
+        cq.select(entityRoot).where(cb.equal(entityRoot.get("name"), name));
         return entityManager
-                .createQuery("select t from TagEntity t where t.name = :name", TagEntity.class)
-                .setParameter("name", name)
+                .createQuery(cq)
                 .getResultList();
     }
 
@@ -64,10 +73,13 @@ public class TagRepositoryImpl implements TagRepository {
             Integer giftCertificateId,
             Map<String, Integer> paginationParam
     ) {
-        String query = "select t from TagEntity t join fetch t.certificates gc where gc.id = :certificateId";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TagEntity> cq = cb.createQuery(TagEntity.class);
+        Root<TagEntity> entityRoot = cq.from(TagEntity.class);
+        entityRoot.fetch("certificates", JoinType.LEFT);
+        cq.where(cb.equal(entityRoot.get("certificates").get("id"), giftCertificateId));
         return entityManager
-                .createQuery(query,TagEntity.class)
-                .setParameter("certificateId", Long.valueOf(giftCertificateId))
+                .createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();

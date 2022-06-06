@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +32,11 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<OrderEntity> findAll(Map<String, Integer> paginationParam) {
-        String query = "select o from OrderEntity o";
-        return entityManager
-                .createQuery(query,OrderEntity.class)
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OrderEntity> cq = cb.createQuery(OrderEntity.class);
+        Root<OrderEntity> entityRoot = cq.from(OrderEntity.class);
+        cq.select(entityRoot);
+        return entityManager.createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
@@ -41,9 +44,12 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public int deleteById(Long aLong) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<OrderEntity> criteriaDelete = cb.createCriteriaDelete(OrderEntity.class);
+        Root<OrderEntity> entityRoot = criteriaDelete.from(OrderEntity.class);
+        criteriaDelete.where(cb.equal(entityRoot.get("id"), aLong));
         return entityManager
-                .createQuery("delete from OrderEntity where id = :id")
-                .setParameter("id", aLong)
+                .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
@@ -54,22 +60,30 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<OrderEntity> findAllOrdersByUserId(Integer userId, Map<String, Integer> paginationParam) {
-        String query = "select o from OrderEntity o join fetch o.user u where u.id = ?1";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OrderEntity> cq = cb.createQuery(OrderEntity.class);
+        Root<OrderEntity> entityRoot = cq.from(OrderEntity.class);
+        entityRoot.fetch("user", JoinType.LEFT);
+        cq.where(cb.equal(entityRoot.get("user").get("id"), userId));
         return entityManager
-                .createQuery(query, OrderEntity.class)
-                .setParameter(1, Long.valueOf(userId))
+                .createQuery(cq)
                 .setFirstResult(paginationParam.get(OFFSET))
                 .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
     }
 
     @Override
-    public List<OrderEntity> findSingleUserOrder(Integer userID, Integer orderId) {
-        String query = "select o from OrderEntity o join fetch o.user u where o.id = ?1 and u.id = ?2";
+    public List<OrderEntity> findSingleUserOrder(Integer userId, Integer orderId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OrderEntity> cq = cb.createQuery(OrderEntity.class);
+        Root<OrderEntity> entityRoot = cq.from(OrderEntity.class);
+        entityRoot.fetch("user", JoinType.LEFT);
+        cq.where(
+                cb.equal(entityRoot.get("user").get("id"), userId),
+                cb.equal(entityRoot.get("id"), orderId)
+        );
         return entityManager
-                .createQuery(query, OrderEntity.class)
-                .setParameter(1, Long.valueOf(orderId))
-                .setParameter(2, Long.valueOf(userID))
+                .createQuery(cq)
                 .getResultList();
     }
 }

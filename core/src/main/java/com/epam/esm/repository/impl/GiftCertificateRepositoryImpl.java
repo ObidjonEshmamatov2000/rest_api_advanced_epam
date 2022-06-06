@@ -1,14 +1,23 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.GiftCertificateEntity;
+import com.epam.esm.entity.OrderEntity;
+import com.epam.esm.entity.TagEntity;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
+
+import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
+import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -29,18 +38,24 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public List<GiftCertificateEntity> findAll(Map<String, Integer> paginationParam) {
-        String query = "select gc from GiftCertificateEntity gc";
-        return entityManager
-                .createQuery(query, GiftCertificateEntity.class)
-                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
-                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        cq.select(entityRoot);
+        return entityManager.createQuery(cq)
+                .setFirstResult(paginationParam.get(OFFSET))
+                .setMaxResults(paginationParam.get(LIMIT))
                 .getResultList();
     }
 
     @Override
     public int deleteById(Long aLong) {
-        return entityManager.createQuery("delete from GiftCertificateEntity where id = :id")
-                .setParameter("id", aLong)
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<GiftCertificateEntity> criteriaDelete = cb.createCriteriaDelete(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = criteriaDelete.from(GiftCertificateEntity.class);
+        criteriaDelete.where(cb.equal(entityRoot.get("id"), aLong));
+        return entityManager
+                .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
@@ -51,10 +66,12 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public List<GiftCertificateEntity> findByName(String name) {
-        String query = "select gc from GiftCertificateEntity gc where gc.name =: name";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        cq.select(entityRoot).where(cb.equal(entityRoot.get("name"), name));
         return entityManager
-                .createQuery(query, GiftCertificateEntity.class)
-                .setParameter("name", name)
+                .createQuery(cq)
                 .getResultList();
     }
 
