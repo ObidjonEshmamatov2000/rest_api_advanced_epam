@@ -10,7 +10,6 @@ import java.util.Map;
  * @param <T> 'T' is Entity type for CRUD operations
  * @param <Id> Primary key of T (object)
  */
-
 public interface CrudRepository<T, Id>{
     /**
      * Creates a new instance of an entity in the database.

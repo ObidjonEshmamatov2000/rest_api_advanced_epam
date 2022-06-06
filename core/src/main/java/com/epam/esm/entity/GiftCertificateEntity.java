@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,7 +21,6 @@ import java.util.Set;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,7 +28,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "gift_certificate")
-public class GiftCertificateEntity extends RepresentationModel<GiftCertificateEntity> {
+public class GiftCertificateEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

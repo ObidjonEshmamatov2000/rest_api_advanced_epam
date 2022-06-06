@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +17,6 @@ import java.util.Objects;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +25,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "app_user")
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
-public class AppUserEntity extends RepresentationModel<AppUserEntity> {
+public class AppUserEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

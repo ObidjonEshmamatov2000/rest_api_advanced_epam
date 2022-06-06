@@ -6,27 +6,30 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Set;
+
+import static com.epam.esm.utils.RegexProvider.DESCRIPTION_REGEX;
+import static com.epam.esm.utils.RegexProvider.NAME_REGEX;
 
 /**
  * @author Obidjon Eshmamatov
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GiftCertificateRequestDto {
-    @Pattern(regexp = "\\w[\\w\\s-]+", message = "A gift certificate's name should contain only alphabetic symbols, space or dash.")
+    @Pattern(regexp = NAME_REGEX, message = "A gift certificate's name should contain only alphabetic symbols, space or dash.")
     @Length(min = 2, max = 100, message = "The length of the gift certificate's name should be between 2 and 100 symbols.")
     private String name;
 
-    @Pattern(regexp = "[^><].+", message = "Symbols '<' and '>' are forbidden.")
+    @Pattern(regexp = DESCRIPTION_REGEX, message = "Symbols '<' and '>' are forbidden.")
     @Length(min = 3, max = 300, message = "The length of the gift certificate description should be between 3 and 300 symbols.")
     private String description;
 

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,7 +19,6 @@ import java.util.Set;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,7 +26,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "tag")
-public class TagEntity extends RepresentationModel<TagEntity> {
+public class TagEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

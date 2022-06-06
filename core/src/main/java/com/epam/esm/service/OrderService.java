@@ -11,7 +11,6 @@ import java.util.List;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 public interface OrderService extends BaseService<OrderEntity, OrderRequestDto> {
     OrderResponseDto findSingleUserOrder(Integer userID, Integer orderId);
 }

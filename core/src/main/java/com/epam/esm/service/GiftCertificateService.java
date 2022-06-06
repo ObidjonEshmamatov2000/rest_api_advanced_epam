@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 public interface GiftCertificateService extends BaseService<GiftCertificateEntity, GiftCertificateRequestDto> {
     GiftCertificateEntity update(GiftCertificateRequestDto update, Long certificateId);
 }

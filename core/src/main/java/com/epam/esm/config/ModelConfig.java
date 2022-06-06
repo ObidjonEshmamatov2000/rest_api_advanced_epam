@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @Configuration
 @ComponentScan(basePackages = {"com.epam.esm"})
 @EnableTransactionManagement

@@ -18,8 +18,6 @@ import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
-
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
     @PersistenceContext
@@ -43,19 +41,19 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public int deleteById(Long aLong) {
+    public int deleteById(Long id) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<OrderEntity> criteriaDelete = cb.createCriteriaDelete(OrderEntity.class);
         Root<OrderEntity> entityRoot = criteriaDelete.from(OrderEntity.class);
-        criteriaDelete.where(cb.equal(entityRoot.get("id"), aLong));
+        criteriaDelete.where(cb.equal(entityRoot.get("id"), id));
         return entityManager
                 .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
     @Override
-    public OrderEntity findById(Long aLong) {
-        return entityManager.find(OrderEntity.class, aLong);
+    public OrderEntity findById(Long id) {
+        return entityManager.find(OrderEntity.class, id);
     }
 
     @Override

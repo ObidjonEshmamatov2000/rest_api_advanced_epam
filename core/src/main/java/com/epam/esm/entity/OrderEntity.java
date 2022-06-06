@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,7 +20,6 @@ import java.util.Objects;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @EntityListeners(AuditListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,7 +27,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "orders")
-public class OrderEntity extends RepresentationModel<OrderEntity> {
+public class OrderEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

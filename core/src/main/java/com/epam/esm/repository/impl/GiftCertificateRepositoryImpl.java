@@ -24,8 +24,6 @@ import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
-
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     @PersistenceContext
@@ -49,19 +47,19 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public int deleteById(Long aLong) {
+    public int deleteById(Long id) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<GiftCertificateEntity> criteriaDelete = cb.createCriteriaDelete(GiftCertificateEntity.class);
         Root<GiftCertificateEntity> entityRoot = criteriaDelete.from(GiftCertificateEntity.class);
-        criteriaDelete.where(cb.equal(entityRoot.get("id"), aLong));
+        criteriaDelete.where(cb.equal(entityRoot.get("id"), id));
         return entityManager
                 .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
     @Override
-    public GiftCertificateEntity findById(Long aLong) {
-        return entityManager.find(GiftCertificateEntity.class, aLong);
+    public GiftCertificateEntity findById(Long id) {
+        return entityManager.find(GiftCertificateEntity.class, id);
     }
 
     @Override

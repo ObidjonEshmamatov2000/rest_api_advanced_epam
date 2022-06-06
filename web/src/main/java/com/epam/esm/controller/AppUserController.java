@@ -1,8 +1,9 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.assembler.AppUserModelAssembler;
+import com.epam.esm.common.BaseResponse;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.service.AppUserService;
-import com.epam.esm.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,37 +14,39 @@ import java.util.List;
 import java.util.Map;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Obidjon Eshmamatov
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @RestController
 @RequestMapping("/api/users")
 public class AppUserController {
     private final AppUserService service;
+    private final AppUserModelAssembler assembler;
 
     @Autowired
-    public AppUserController(AppUserService service) {
+    public AppUserController(AppUserService service, AppUserModelAssembler assembler) {
         this.service = service;
+        this.assembler = assembler;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable("id") long id) {
+    public ResponseEntity<BaseResponse> getUserById(@PathVariable("id") long id) {
         AppUserEntity userById = service.findUserById(id);
-        addLinks(userById);
-        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, userById);
+        BaseResponse success = new BaseResponse(
+                HttpStatus.OK.value(),
+                SUCCESS_MESSAGE,
+                assembler.toModel(userById)
+        );
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllUsers(
+    public ResponseEntity<BaseResponse> getAllUsers(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
@@ -55,16 +58,13 @@ public class AppUserController {
         params.put(PAGE_SIZE, pageSize);
         params.put(PAGE_NUMBER, pageNumber);
         List<AppUserEntity> allUsers = service.findAllUsers(params);
-        allUsers.forEach(this::addLinks);
-        BaseResponse success = new BaseResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, allUsers);
+        BaseResponse success = new BaseResponse(
+                HttpStatus.OK.value(),
+                SUCCESS_MESSAGE,
+                assembler.toCollectionModels(allUsers)
+        );
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(success);
-    }
-
-    private void addLinks(AppUserEntity appUser) {
-        if (appUser != null)
-            appUser.add(linkTo(methodOn(AppUserController.class)
-                    .getUserById(appUser.getId())).withSelfRel());
     }
 }

@@ -21,8 +21,6 @@ import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
-
 @Repository
 public class AppUserRepositoryImpl implements AppUserRepository {
     @PersistenceContext
@@ -47,19 +45,19 @@ public class AppUserRepositoryImpl implements AppUserRepository {
     }
 
     @Override
-    public int deleteById(Long aLong) {
+    public int deleteById(Long id) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<AppUserEntity> criteriaDelete = cb.createCriteriaDelete(AppUserEntity.class);
         Root<AppUserEntity> appUserEntityRoot = criteriaDelete.from(AppUserEntity.class);
-        criteriaDelete.where(cb.equal(appUserEntityRoot.get("id"), aLong));
+        criteriaDelete.where(cb.equal(appUserEntityRoot.get("id"), id));
         return entityManager
                 .createQuery(criteriaDelete)
                 .executeUpdate();
     }
 
     @Override
-    public AppUserEntity findById(Long aLong) {
-        return entityManager.find(AppUserEntity.class, aLong);
+    public AppUserEntity findById(Long id) {
+        return entityManager.find(AppUserEntity.class, id);
     }
 
     @Override

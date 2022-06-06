@@ -29,7 +29,6 @@ import static com.epam.esm.utils.ParamsStringProvider.*;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository repository;
@@ -171,16 +170,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     public boolean checkIfSortingParamValid(String sortParam) {
-        List<String> gift_certificate_params = new ArrayList<>();
-        gift_certificate_params.add(NAME);
-        gift_certificate_params.add(DESCRIPTION);
-        gift_certificate_params.add(PRICE);
-        gift_certificate_params.add(DURATION);
-        gift_certificate_params.add(CREATE_DATE);
-        gift_certificate_params.add(LAST_UPDATE_DATE);
+        List<String> giftCertificateParams = new ArrayList<>();
+        giftCertificateParams.add(NAME);
+        giftCertificateParams.add(DESCRIPTION);
+        giftCertificateParams.add(PRICE);
+        giftCertificateParams.add(DURATION);
+        giftCertificateParams.add(CREATE_DATE);
+        giftCertificateParams.add(LAST_UPDATE_DATE);
 
         return sortParam != null &&
-                gift_certificate_params.stream().anyMatch(sortParam::contains) &&
+                giftCertificateParams.stream().anyMatch(sortParam::contains) &&
                 (sortParam.contains(ASC) || sortParam.contains(DESC));
     }
 

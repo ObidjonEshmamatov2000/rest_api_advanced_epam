@@ -14,7 +14,6 @@ import static com.epam.esm.utils.ParamsStringProvider.*;
  * @project rest_api_advanced_2
  * @created 31/05/2022 - 4:46 PM
  */
-
 public class PaginationProvider {
     private static final int DEFAULT_LIMIT = 25;
     private static final int DEFAULT_OFFSET = 1;
