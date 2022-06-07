@@ -1,8 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.assembler.GiftCertificateModelAssembler;
+import com.epam.esm.hateos.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.common.BaseResponse;
-import com.epam.esm.dto.GiftCertificateRequestDto;
+import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.service.GiftCertificateService;

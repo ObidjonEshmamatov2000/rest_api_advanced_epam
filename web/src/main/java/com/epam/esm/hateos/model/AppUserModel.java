@@ -1,4 +1,4 @@
-package com.epam.esm.dto.model;
+package com.epam.esm.hateos.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;

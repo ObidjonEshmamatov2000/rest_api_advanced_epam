@@ -1,15 +1,16 @@
-package com.epam.esm.assembler;
+package com.epam.esm.hateos.assembler;
 
 import com.epam.esm.controller.AppUserController;
 import com.epam.esm.controller.GiftCertificateController;
 import com.epam.esm.controller.OrderController;
-import com.epam.esm.dto.model.AppUserModel;
-import com.epam.esm.dto.model.GiftCertificateModel;
-import com.epam.esm.dto.model.OrderModel;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.entity.OrderEntity;
+import com.epam.esm.hateos.model.AppUserModel;
+import com.epam.esm.hateos.model.GiftCertificateModel;
+import com.epam.esm.hateos.model.OrderModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +24,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @project rest_api_advanced_2
  * @created 06/06/2022 - 9:54 PM
  */
+@Component
 public class OrderModelAssembler
         extends RepresentationModelAssemblerSupport<OrderEntity, OrderModel> {
 
-    public OrderModelAssembler(Class<?> controllerClass, Class<OrderModel> resourceType) {
-        super(controllerClass, resourceType);
+    public OrderModelAssembler() {
+        super(OrderController.class, OrderModel.class);
     }
 
     @Override

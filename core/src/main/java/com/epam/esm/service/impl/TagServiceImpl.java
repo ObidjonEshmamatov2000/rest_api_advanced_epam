@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.TagRequestDto;
+import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.exception.ApplicationDuplicateDataException;
 import com.epam.esm.exception.ApplicationNotFoundException;
@@ -9,14 +9,10 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
 import com.epam.esm.utils.ApplicationValidator;
 import com.epam.esm.utils.PaginationProvider;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 import java.util.List;
 import java.util.Map;

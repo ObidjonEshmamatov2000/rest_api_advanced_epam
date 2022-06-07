@@ -1,12 +1,13 @@
-package com.epam.esm.assembler;
+package com.epam.esm.hateos.assembler;
 
 import com.epam.esm.controller.GiftCertificateController;
 import com.epam.esm.controller.TagController;
-import com.epam.esm.dto.model.GiftCertificateModel;
-import com.epam.esm.dto.model.TagModel;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.entity.TagEntity;
+import com.epam.esm.hateos.model.GiftCertificateModel;
+import com.epam.esm.hateos.model.TagModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +22,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @project rest_api_advanced_2
  * @created 06/06/2022 - 9:42 PM
  */
+@Component
 public class GiftCertificateModelAssembler
         extends RepresentationModelAssemblerSupport<GiftCertificateEntity, GiftCertificateModel> {
 
-    public GiftCertificateModelAssembler(Class<?> controllerClass, Class<GiftCertificateModel> resourceType) {
-        super(controllerClass, resourceType);
+    public GiftCertificateModelAssembler() {
+        super(GiftCertificateController.class, GiftCertificateModel.class);
     }
 
     @Override

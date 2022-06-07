@@ -1,10 +1,8 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.OrderRequestDto;
-import com.epam.esm.dto.OrderResponseDto;
+import com.epam.esm.dto.request.OrderRequestDto;
+import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.OrderEntity;
-
-import java.util.List;
 
 /**
  * @author Obidjon Eshmamatov

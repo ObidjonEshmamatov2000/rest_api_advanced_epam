@@ -1,4 +1,4 @@
-package com.epam.esm.dto;
+package com.epam.esm.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

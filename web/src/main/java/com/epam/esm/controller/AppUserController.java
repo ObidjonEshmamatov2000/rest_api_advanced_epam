@@ -1,6 +1,6 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.assembler.AppUserModelAssembler;
+import com.epam.esm.hateos.assembler.AppUserModelAssembler;
 import com.epam.esm.common.BaseResponse;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.service.AppUserService;

@@ -1,8 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.assembler.TagModelAssembler;
+import com.epam.esm.hateos.assembler.TagModelAssembler;
 import com.epam.esm.common.BaseResponse;
-import com.epam.esm.dto.TagRequestDto;
+import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.service.TagService;

@@ -1,8 +1,7 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.GiftCertificateRequestDto;
+import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
-import org.springframework.validation.BindingResult;
 
 /**
  * @author Obidjon Eshmamatov

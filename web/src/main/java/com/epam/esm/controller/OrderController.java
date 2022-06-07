@@ -1,9 +1,9 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.assembler.OrderModelAssembler;
+import com.epam.esm.hateos.assembler.OrderModelAssembler;
 import com.epam.esm.common.BaseResponse;
-import com.epam.esm.dto.OrderRequestDto;
-import com.epam.esm.dto.OrderResponseDto;
+import com.epam.esm.dto.request.OrderRequestDto;
+import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.service.OrderService;

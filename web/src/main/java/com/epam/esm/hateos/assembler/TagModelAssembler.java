@@ -1,9 +1,10 @@
-package com.epam.esm.assembler;
+package com.epam.esm.hateos.assembler;
 
 import com.epam.esm.controller.TagController;
-import com.epam.esm.dto.model.TagModel;
 import com.epam.esm.entity.TagEntity;
+import com.epam.esm.hateos.model.TagModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,10 +18,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @project rest_api_advanced_2
  * @created 06/06/2022 - 9:22 PM
  */
+@Component
 public class TagModelAssembler extends RepresentationModelAssemblerSupport<TagEntity, TagModel> {
 
-    public TagModelAssembler(Class<?> controllerClass, Class<TagModel> resourceType) {
-        super(controllerClass, resourceType);
+    public TagModelAssembler() {
+        super(TagController.class, TagModel.class);
     }
 
     @Override

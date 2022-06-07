@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.GiftCertificateRequestDto;
+import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.repository.GiftCertificateRepository;
