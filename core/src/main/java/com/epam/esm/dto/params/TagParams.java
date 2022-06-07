@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class TagParams {
     private String name;
-    private int certificateId;
+    private Integer certificateId;
     private PaginationParams paginationParams;
 }

@@ -1,13 +1,11 @@
 package com.epam.esm.utils;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.PAGE_NUMBER_NOT_VALID_ERROR;
+import static com.epam.esm.utils.ParamsStringProvider.PAGE_SIZE_NOT_VALID_ERROR;
 
 /**
  * @author Obidjon Eshmamatov
@@ -25,10 +23,9 @@ public class PaginationProvider {
         this.validator = applicationValidator;
     }
 
-    public Map<String, Integer> getPaginationParam(Map<String, Object> params) {
-        Map<String, Integer> paginationParams = new HashMap<>();
-        Integer limit = (Integer) params.get(PAGE_SIZE);
-        Integer offset = (Integer) params.get(PAGE_NUMBER);
+    public PaginationParams getPaginationParams(PaginationParams paginationParams) {
+        Integer limit = paginationParams.getPageSize();
+        Integer offset = paginationParams.getPageNumber();
 
         if (limit == null) {
             limit = DEFAULT_LIMIT;
@@ -41,8 +38,10 @@ public class PaginationProvider {
             throw new ApplicationNotValidDataException(PAGE_NUMBER_NOT_VALID_ERROR, offset);
         }
 
-        paginationParams.put(LIMIT, limit);
-        paginationParams.put(OFFSET, limit * (offset - 1));
+        offset = limit * (offset - 1);
+
+        paginationParams.setPageSize(limit);
+        paginationParams.setPageNumber(offset);
         return paginationParams;
     }
 }

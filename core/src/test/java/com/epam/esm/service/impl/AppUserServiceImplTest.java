@@ -1,26 +1,25 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.AppUserParams;
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
 import com.epam.esm.repository.AppUserRepository;
 import com.epam.esm.utils.ApplicationValidator;
 import com.epam.esm.utils.PaginationProvider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
-import static com.epam.esm.utils.ParamsStringProvider.NAME;
+import static com.epam.esm.utils.ParamsStringProvider.ID_NOT_VALID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -61,83 +60,64 @@ class AppUserServiceImplTest {
     @Test
     void canFindAllUsersWhenNameValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 25);
-        params.put(OFFSET, 1);
-        params.put(NAME, "user");
-        String name = (String) params.get(NAME);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        AppUserParams appUserParams = new AppUserParams("user", null, paginationParams);
 
-        Map<String, Integer> paginationParams = new HashMap<>();
-        paginationParams.put(LIMIT, 15);
-        paginationParams.put(OFFSET, 0);
+        PaginationParams pageParams = new PaginationParams(15, 0);
 
-        given(validator.isNameValid(name)).willReturn(true);
-        given(paginationProvider.getPaginationParam(params)).willReturn(paginationParams);
-        given(appUserRepository.findAllUsersByName(name, paginationParams)).willReturn(appUserEntities);
+        given(validator.isNameValid(appUserParams.getName())).willReturn(true);
+        given(paginationProvider.getPaginationParams(appUserParams.getPaginationParams())).willReturn(pageParams);
+        given(appUserRepository.findAllUsersByName(appUserParams.getName(), pageParams)).willReturn(appUserEntities);
 
         //when
-        List<AppUserEntity> allUsers = underTest.findAllUsers(params);
+        List<AppUserEntity> allUsers = underTest.findAllUsers(appUserParams);
 
         //then
         assertThat(allUsers).isEqualTo(appUserEntities);
-        verify(appUserRepository, times(1)).findAllUsersByName(name, paginationParams);
+        verify(appUserRepository, times(1)).findAllUsersByName(appUserParams.getName(), pageParams);
         verify(appUserRepository, never()).findAllUsersByEmail(any(), any());
     }
 
     @Test
     void canFindAllUsersWhenNameNotValidEmailValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 25);
-        params.put(OFFSET, 1);
-        params.put(EMAIL, "email");
-        String name = (String) params.get(NAME);
-        String email = (String) params.get(EMAIL);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        AppUserParams appUserParams = new AppUserParams(null, "email", paginationParams);
 
-        Map<String, Integer> paginationParams = new HashMap<>();
-        paginationParams.put(LIMIT, 15);
-        paginationParams.put(OFFSET, 0);
+        PaginationParams pageParams = new PaginationParams(15, 0);
 
-        given(validator.isNameValid(name)).willReturn(false);
-        given(validator.isEmailValid(email)).willReturn(true);
-        given(paginationProvider.getPaginationParam(params)).willReturn(paginationParams);
-        given(appUserRepository.findAllUsersByEmail(email, paginationParams)).willReturn(appUserEntities);
+        given(validator.isEmailValid(appUserParams.getEmail())).willReturn(true);
+        given(paginationProvider.getPaginationParams(appUserParams.getPaginationParams())).willReturn(pageParams);
+        given(appUserRepository.findAllUsersByEmail(appUserParams.getEmail(), pageParams)).willReturn(appUserEntities);
 
         //when
-        List<AppUserEntity> allUsers = underTest.findAllUsers(params);
+        List<AppUserEntity> allUsers = underTest.findAllUsers(appUserParams);
 
         //then
         assertThat(allUsers).isEqualTo(appUserEntities);
         verify(appUserRepository, never()).findAllUsersByName(any(), any());
-        verify(appUserRepository, times(1)).findAllUsersByEmail(email, paginationParams);
+        verify(appUserRepository, times(1)).findAllUsersByEmail(appUserParams.getEmail(), pageParams);
     }
 
     @Test
     void canFindAllUsersWhenBothNameNotValidEmailNotValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 25);
-        params.put(OFFSET, 1);
-        String name = (String) params.get(NAME);
-        String email = (String) params.get(EMAIL);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        AppUserParams appUserParams = new AppUserParams(null, null, paginationParams);
 
-        Map<String, Integer> paginationParams = new HashMap<>();
-        paginationParams.put(LIMIT, 15);
-        paginationParams.put(OFFSET, 0);
+        PaginationParams pageParams = new PaginationParams(15, 0);
 
-        given(validator.isNameValid(name)).willReturn(false);
-        given(validator.isEmailValid(email)).willReturn(false);
-        given(paginationProvider.getPaginationParam(params)).willReturn(paginationParams);
-        given(appUserRepository.findAll(paginationParams)).willReturn(appUserEntities);
+        given(paginationProvider.getPaginationParams(appUserParams.getPaginationParams())).willReturn(pageParams);
+        given(appUserRepository.findAll(pageParams)).willReturn(appUserEntities);
 
         //when
-        List<AppUserEntity> allUsers = underTest.findAllUsers(params);
+        List<AppUserEntity> allUsers = underTest.findAllUsers(appUserParams);
 
         //then
         assertThat(allUsers).isEqualTo(appUserEntities);
         verify(appUserRepository, never()).findAllUsersByName(any(), any());
         verify(appUserRepository, never()).findAllUsersByEmail(any(), any());
-        verify(appUserRepository, times(1)).findAll(paginationParams);
+        verify(appUserRepository, times(1)).findAll(pageParams);
     }
 
     @Test

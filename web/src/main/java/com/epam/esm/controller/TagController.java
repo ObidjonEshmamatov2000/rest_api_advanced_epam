@@ -1,10 +1,12 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.hateos.assembler.TagModelAssembler;
 import com.epam.esm.common.BaseResponse;
+import com.epam.esm.dto.params.PaginationParams;
+import com.epam.esm.dto.params.TagParams;
 import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
+import com.epam.esm.hateos.assembler.TagModelAssembler;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.SUCCESS_MESSAGE;
 
 /**
  * @author Obidjon Eshmamatov
@@ -37,7 +37,6 @@ public class TagController {
         this.assembler = tagModelAssembler;
     }
 
-
     @GetMapping("")
     public ResponseEntity<BaseResponse> getAll(
             @RequestParam(name = "name", required = false) String name,
@@ -45,13 +44,9 @@ public class TagController {
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(NAME, name);
-        params.put(CERTIFICATE_ID, certificateId);
-        params.put(PAGE_SIZE, pageSize);
-        params.put(PAGE_NUMBER, pageNumber);
-
-        List<TagEntity> entities = tagService.findAll(params);
+        PaginationParams paginationParams = new PaginationParams(pageSize, pageNumber);
+        TagParams tagParams = new TagParams(name, certificateId, paginationParams);
+        List<TagEntity> entities = tagService.findAllTags(tagParams);
         BaseResponse success = new BaseResponse(
                 HttpStatus.OK.value(),
                 SUCCESS_MESSAGE,

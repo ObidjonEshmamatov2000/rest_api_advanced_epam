@@ -1,23 +1,20 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.repository.GiftCertificateRepository;
-import com.epam.esm.utils.ParamsStringProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
-import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
+import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.LAST_UPDATE_DATE;
 
 /**
  * @author Obidjon Eshmamatov
@@ -35,14 +32,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificateEntity> findAll(Map<String, Integer> paginationParam) {
+    public List<GiftCertificateEntity> findAll(PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
         Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
         cq.select(entityRoot);
         return entityManager.createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
@@ -76,76 +73,112 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public List<GiftCertificateEntity> findAllFilteredAndSortedByName(
             String name,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     ) {
-        String query = "select gc from GiftCertificateEntity gc where gc.name like CONCAT('%', ?1, '%')";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        cq.select(entityRoot).where(cb.like(entityRoot.get("name"), "%" + name + "%"));
+        if (sortingString != null) {
+            List<Order> orderList = buildOrderList(cb, entityRoot, sortingString);
+            cq.orderBy(orderList);
+        }
         return entityManager
-                .createQuery(buildSortingQuery(query, sortingString),GiftCertificateEntity.class)
-                .setParameter(1, name)
-                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
-                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .createQuery(cq)
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
-    private String buildSortingQuery(String query, String sortingString) {
-        return sortingString.isEmpty() ? query : query + " order by " + sortingString;
+    private List<Order> buildOrderList(
+            CriteriaBuilder cb,
+            Root<GiftCertificateEntity> entityRoot,
+            String sortingString
+    ) {
+        List<String> giftCertificateParams = new ArrayList<>();
+        giftCertificateParams.add(NAME);
+        giftCertificateParams.add(DESCRIPTION);
+        giftCertificateParams.add(PRICE);
+        giftCertificateParams.add(DURATION);
+        giftCertificateParams.add(CREATE_DATE);
+        giftCertificateParams.add(LAST_UPDATE_DATE);
+
+        List<Order> orderList = new ArrayList<>();
+        String[] strings = sortingString.split(", ");
+        for (String s: strings) {
+            String[] split = s.split(" ");
+            if (split.length == 2) {
+                giftCertificateParams.forEach(gc -> {
+                    if (split[0].equals(gc)) {
+                        if (split[1].equals("asc")) orderList.add(cb.asc(entityRoot.get(gc)));
+                        else orderList.add(cb.desc(entityRoot.get(gc)));
+                    }
+                });
+            }
+        }
+        return orderList;
     }
 
     @Override
     public List<GiftCertificateEntity> findAllFilteredAndSortedByDescription(
             String description,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     ) {
-        String query = "select gc from GiftCertificateEntity gc where gc.description like CONCAT('%', ?1, '%')";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        cq.select(entityRoot).where(cb.like(entityRoot.get("description"), "%" + description + "%"));
+        if (sortingString != null) {
+            List<Order> orderList = buildOrderList(cb, entityRoot, sortingString);
+            cq.orderBy(orderList);
+        }
         return entityManager
-                .createQuery(buildSortingQuery(query, sortingString), GiftCertificateEntity.class)
-                .setParameter(1, description)
-                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
-                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .createQuery(cq)
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
     @Override
     public List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(
             List<String> tagNameList,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     ) {
-        String query = "select g FROM GiftCertificateEntity g JOIN FETCH g.tags t";
-        String tagNameQuery = buildTagNameQuery(tagNameList, query);
-        return entityManager
-                .createQuery(buildSortingQuery(tagNameQuery, sortingString), GiftCertificateEntity.class)
-                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
-                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
-                .getResultList();
-    }
-
-    //String query = "select gc from GiftCertificateEntity gc inner join TagEntity t on t.id = gc.id where t.name in (' ')";
-    private String buildTagNameQuery(List<String> tagNameList, String query) {
-        StringBuilder tagNameQuery = new StringBuilder(query).append(" where t.name in (");
-        for (int i=0; i<tagNameList.size(); i++) {
-            if (i != 0) {
-                tagNameQuery.append(", ").append("'").append(tagNameList.get(i)).append("'");
-            } else {
-                tagNameQuery.append("'").append(tagNameList.get(i)).append("'");
-            }
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        SetJoin<GiftCertificateEntity, TagEntity> tags = entityRoot.joinSet("tags", JoinType.LEFT);
+        cq.select(entityRoot).where(tags.get("name").in(tagNameList));
+        if (sortingString != null) {
+            List<Order> orderList = buildOrderList(cb, entityRoot, sortingString);
+            cq.orderBy(orderList);
         }
-        tagNameQuery.append(")");
-        return tagNameQuery.toString();
+        return entityManager
+                .createQuery(cq)
+                .setMaxResults(paginationParams.getPageSize())
+                .getResultList();
     }
 
     @Override
     public List<GiftCertificateEntity> findAllFilteredAndSorted(
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     ) {
-        String query = "select gc from GiftCertificateEntity gc";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificateEntity> cq = cb.createQuery(GiftCertificateEntity.class);
+        Root<GiftCertificateEntity> entityRoot = cq.from(GiftCertificateEntity.class);
+        cq.select(entityRoot);
+        if (sortingString != null) {
+            List<Order> orderList = buildOrderList(cb, entityRoot, sortingString);
+            cq.orderBy(orderList);
+        }
         return entityManager
-                .createQuery(buildSortingQuery(query, sortingString), GiftCertificateEntity.class)
-                .setFirstResult(paginationParam.get(ParamsStringProvider.OFFSET))
-                .setMaxResults(paginationParam.get(ParamsStringProvider.LIMIT))
+                .createQuery(cq)
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 }

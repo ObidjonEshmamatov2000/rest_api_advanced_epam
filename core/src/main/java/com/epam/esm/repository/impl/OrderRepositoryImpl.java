@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.repository.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -8,10 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.List;
-import java.util.Map;
-
-import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
-import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -29,14 +26,14 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<OrderEntity> findAll(Map<String, Integer> paginationParam) {
+    public List<OrderEntity> findAll(PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<OrderEntity> cq = cb.createQuery(OrderEntity.class);
         Root<OrderEntity> entityRoot = cq.from(OrderEntity.class);
         cq.select(entityRoot);
         return entityManager.createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
@@ -57,7 +54,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<OrderEntity> findAllOrdersByUserId(Integer userId, Map<String, Integer> paginationParam) {
+    public List<OrderEntity> findAllOrdersByUserId(Integer userId, PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<OrderEntity> cq = cb.createQuery(OrderEntity.class);
         Root<OrderEntity> entityRoot = cq.from(OrderEntity.class);
@@ -65,8 +62,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         cq.where(cb.equal(entityRoot.get("user").get("id"), userId));
         return entityManager
                 .createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 

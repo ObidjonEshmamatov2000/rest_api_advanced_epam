@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.AppUserParams;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.exception.ApplicationNotFoundException;
 import com.epam.esm.exception.ApplicationNotValidDataException;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
@@ -39,23 +39,31 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public List<AppUserEntity> findAllUsers(Map<String, Object> params) {
+    public List<AppUserEntity> findAllUsers(AppUserParams appUserParams) {
         List<AppUserEntity> all;
-        String name = (String) params.get(NAME);
-        String email = (String) params.get(EMAIL);
+        String name = appUserParams.getName();
+        String email = appUserParams.getEmail();
 
-        if (validator.isNameValid(name)) {
+        if (name != null) {
+            if (!validator.isNameValid(name)) {
+                throw new ApplicationNotValidDataException(NAME_NOT_VALID, name);
+            }
             all = repository.findAllUsersByName(
                     name,
-                    paginationProvider.getPaginationParam(params)
+                    paginationProvider.getPaginationParams(appUserParams.getPaginationParams())
             );
-        } else if (validator.isEmailValid(email)) {
+        } else if (email != null) {
+            if (!validator.isEmailValid(email)) {
+                throw new ApplicationNotValidDataException(EMAIL_NOT_VALID, email);
+            }
             all = repository.findAllUsersByEmail(
                     email,
-                    paginationProvider.getPaginationParam(params)
+                    paginationProvider.getPaginationParams(appUserParams.getPaginationParams())
             );
         } else {
-            all = repository.findAll(paginationProvider.getPaginationParam(params));
+            all = repository.findAll(
+                    paginationProvider.getPaginationParams(appUserParams.getPaginationParams())
+            );
         }
         return all;
     }

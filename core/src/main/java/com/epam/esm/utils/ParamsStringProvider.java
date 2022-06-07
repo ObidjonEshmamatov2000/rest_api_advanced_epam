@@ -47,4 +47,6 @@ public final class ParamsStringProvider {
     public static final String PARAM_TYPE_MISMATCH_ERROR = "json parse error, params does not match";
     public static final String SERVLET_NOT_COMPLETE_ERROR = "some params is not provided";
 
+    public static final String EMAIL_NOT_VALID = "email is not valid";
+    public static final String DESC_NOT_VALID = "description is not valid";
 }

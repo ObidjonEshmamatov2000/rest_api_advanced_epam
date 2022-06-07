@@ -1,11 +1,13 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.hateos.assembler.OrderModelAssembler;
 import com.epam.esm.common.BaseResponse;
+import com.epam.esm.dto.params.OrderParams;
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.dto.request.OrderRequestDto;
 import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.OrderEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
+import com.epam.esm.hateos.assembler.OrderModelAssembler;
 import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,11 +17,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.SUCCESS_MESSAGE;
 
 /**
  * @author Obidjon Eshmamatov
@@ -40,16 +40,13 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAllOrders(
-            @RequestParam(name = "userId", required = false) Integer userID,
+            @RequestParam(name = "userId", required = false) Integer userId,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(PAGE_SIZE, pageSize);
-        params.put(PAGE_NUMBER, pageNumber);
-        params.put(USER_ID, userID);
-
-        List<OrderEntity> entities = service.findAll(params);
+        PaginationParams paginationParams = new PaginationParams(pageSize, pageNumber);
+        OrderParams orderParams = new OrderParams(userId, paginationParams);
+        List<OrderEntity> entities = service.findAllOrders(orderParams);
         BaseResponse success = new BaseResponse(
                 HttpStatus.OK.value(),
                 SUCCESS_MESSAGE,

@@ -1,9 +1,9 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.params.AppUserParams;
 import com.epam.esm.entity.AppUserEntity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Obidjon Eshmamatov
@@ -11,7 +11,7 @@ import java.util.Map;
  * @created 31/05/2022 - 4:46 PM
  */
 public interface AppUserService {
-    List<AppUserEntity> findAllUsers(Map<String, Object> params);
+    List<AppUserEntity> findAllUsers(AppUserParams appUserParams);
 
     AppUserEntity findUserById(Long id);
 }

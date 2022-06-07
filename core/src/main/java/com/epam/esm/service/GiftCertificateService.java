@@ -1,7 +1,10 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.params.GiftCertificateParams;
 import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
+
+import java.util.List;
 
 /**
  * @author Obidjon Eshmamatov
@@ -10,4 +13,6 @@ import com.epam.esm.entity.GiftCertificateEntity;
  */
 public interface GiftCertificateService extends BaseService<GiftCertificateEntity, GiftCertificateRequestDto> {
     GiftCertificateEntity update(GiftCertificateRequestDto update, Long certificateId);
+
+    List<GiftCertificateEntity> findAllGiftCertificates(GiftCertificateParams giftCertificateParams);
 }

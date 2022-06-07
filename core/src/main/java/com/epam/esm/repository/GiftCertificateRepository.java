@@ -1,9 +1,9 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.GiftCertificateEntity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Obidjon Eshmamatov
@@ -15,24 +15,24 @@ public interface GiftCertificateRepository extends CrudRepository<GiftCertificat
 
     List<GiftCertificateEntity> findAllFilteredAndSortedByName(
             String name,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     );
 
     List<GiftCertificateEntity> findAllFilteredAndSortedByDescription(
             String description,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     );
 
     List<GiftCertificateEntity> findAllFilteredAndSortedByTagNames(
             List<String> tagNameList,
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String sortingString
     );
 
     List<GiftCertificateEntity> findAllFilteredAndSorted(
-            Map<String, Integer> paginationParam,
+            PaginationParams paginationParams,
             String validSortingString
     );
 }

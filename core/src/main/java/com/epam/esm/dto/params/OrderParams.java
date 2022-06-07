@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class OrderParams {
-    private int userId;
+    private Integer userId;
     private PaginationParams paginationParams;
 }

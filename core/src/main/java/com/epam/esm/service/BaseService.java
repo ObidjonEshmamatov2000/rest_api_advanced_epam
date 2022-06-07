@@ -1,8 +1,5 @@
 package com.epam.esm.service;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Obidjon Eshmamatov
  * @project rest_api_advanced_2
@@ -14,6 +11,4 @@ public interface BaseService<T, G> {
     T findById(Long id);
 
     void deleteById(Long id);
-
-    List<T> findAll(Map<String, Object> params);
 }

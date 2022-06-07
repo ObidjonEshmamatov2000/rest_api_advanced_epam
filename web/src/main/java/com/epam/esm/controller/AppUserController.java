@@ -1,19 +1,19 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.hateos.assembler.AppUserModelAssembler;
 import com.epam.esm.common.BaseResponse;
+import com.epam.esm.dto.params.AppUserParams;
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.AppUserEntity;
+import com.epam.esm.hateos.assembler.AppUserModelAssembler;
 import com.epam.esm.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.SUCCESS_MESSAGE;
 
 /**
  * @author Obidjon Eshmamatov
@@ -52,12 +52,9 @@ public class AppUserController {
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(NAME, name);
-        params.put(EMAIL, email);
-        params.put(PAGE_SIZE, pageSize);
-        params.put(PAGE_NUMBER, pageNumber);
-        List<AppUserEntity> allUsers = service.findAllUsers(params);
+        PaginationParams paginationParams = new PaginationParams(pageSize, pageNumber);
+        AppUserParams appUserParams = new AppUserParams(name, email, paginationParams);
+        List<AppUserEntity> allUsers = service.findAllUsers(appUserParams);
         BaseResponse success = new BaseResponse(
                 HttpStatus.OK.value(),
                 SUCCESS_MESSAGE,

@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.OrderParams;
 import com.epam.esm.dto.request.OrderRequestDto;
 import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.AppUserEntity;
@@ -22,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
@@ -100,21 +100,6 @@ public class OrderServiceImpl implements OrderService {
         repository.deleteById(id);
     }
 
-    @Override
-    public List<OrderEntity> findAll(Map<String, Object> params) {
-        List<OrderEntity> all;
-        Integer userId = (Integer) params.get(USER_ID);
-        if (userId!= null && validator.isNumberValid(userId)) {
-            all = repository.findAllOrdersByUserId(
-                    userId,
-                    paginationProvider.getPaginationParam(params)
-            );
-        } else {
-            throw new ApplicationNotValidDataException(ID_NOT_VALID, "userId");
-        }
-        return all;
-    }
-
     private LocalDateTime getCurrentTime() {
         return LocalDateTime.now(ZoneId.systemDefault());
     }
@@ -131,5 +116,20 @@ public class OrderServiceImpl implements OrderService {
             orderResponseDto.setCreateDate(userOrder.get(0).getCreateDate());
         }
         return orderResponseDto;
+    }
+
+    @Override
+    public List<OrderEntity> findAllOrders(OrderParams orderParams) {
+        List<OrderEntity> all;
+        Integer userId = orderParams.getUserId();
+        if (userId!= null && validator.isNumberValid(userId)) {
+            all = repository.findAllOrdersByUserId(
+                    userId,
+                    paginationProvider.getPaginationParams(orderParams.getPaginationParams())
+            );
+        } else {
+            throw new ApplicationNotValidDataException(ID_NOT_VALID, "userId");
+        }
+        return all;
     }
 }

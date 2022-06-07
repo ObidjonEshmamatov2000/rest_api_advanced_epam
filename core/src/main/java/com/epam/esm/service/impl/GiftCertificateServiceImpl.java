@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.GiftCertificateParams;
 import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
@@ -109,34 +110,41 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateEntity> findAll(Map<String, Object> params) {
+    public List<GiftCertificateEntity> findAllGiftCertificates(GiftCertificateParams giftCertificateParams) {
         List<GiftCertificateEntity> all;
-        String name = (String) params.get(NAME);
-        String description = (String) params.get(DESCRIPTION);
-        String tagNames = (String) params.get(TAG_NAMES);
+        String name = giftCertificateParams.getName();
+        String description = giftCertificateParams.getDescription();
+        String tagNames = giftCertificateParams.getTagNames();
+        String sortParams = giftCertificateParams.getSortParams();
 
-        if (validator.isNameValid(name)) {
+        if (name != null) {
+            if (!validator.isNameValid(name)) {
+                throw new ApplicationNotValidDataException(NAME_NOT_VALID, name);
+            }
             all = repository.findAllFilteredAndSortedByName(
                     name,
-                    paginationProvider.getPaginationParam(params),
-                    getValidSortingString(params)
+                    paginationProvider.getPaginationParams(giftCertificateParams.getPaginationParams()),
+                    sortParams
             );
-        } else if (validator.isDescriptionValid(description)) {
+        } else if (description != null) {
+            if (!validator.isDescriptionValid(description)) {
+                throw new ApplicationNotValidDataException(DESC_NOT_VALID, description);
+            }
             all = repository.findAllFilteredAndSortedByDescription(
                     description,
-                    paginationProvider.getPaginationParam(params),
-                    getValidSortingString(params)
+                    paginationProvider.getPaginationParams(giftCertificateParams.getPaginationParams()),
+                    sortParams
             );
         } else if (tagNames != null) {
             all = repository.findAllFilteredAndSortedByTagNames(
                     buildValidTagNameList(tagNames),
-                    paginationProvider.getPaginationParam(params),
-                    getValidSortingString(params)
+                    paginationProvider.getPaginationParams(giftCertificateParams.getPaginationParams()),
+                    sortParams
             );
         } else {
             all = repository.findAllFilteredAndSorted(
-                    paginationProvider.getPaginationParam(params),
-                    getValidSortingString(params)
+                    paginationProvider.getPaginationParams(giftCertificateParams.getPaginationParams()),
+                    sortParams
             );
         }
         return all;
@@ -150,37 +158,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             }
         }
         return tagNameList;
-    }
-
-    private String getValidSortingString(Map<String, Object> params) {
-        StringBuilder builder = new StringBuilder();
-        String sortParams = (String) params.get(SORT_PARAMS);  // id desc
-        if (sortParams != null) {
-            String[] sortArray = sortParams.split(", ");
-            for (int i=0; i < sortArray.length; i++) {
-                String param = sortArray[i];
-                if (checkIfSortingParamValid(param)) {
-                    if (i != 0) {
-                        builder.append(", ").append(param);
-                    } else builder.append(param);
-                }
-            }
-        }
-        return builder.toString();
-    }
-
-    public boolean checkIfSortingParamValid(String sortParam) {
-        List<String> giftCertificateParams = new ArrayList<>();
-        giftCertificateParams.add(NAME);
-        giftCertificateParams.add(DESCRIPTION);
-        giftCertificateParams.add(PRICE);
-        giftCertificateParams.add(DURATION);
-        giftCertificateParams.add(CREATE_DATE);
-        giftCertificateParams.add(LAST_UPDATE_DATE);
-
-        return sortParam != null &&
-                giftCertificateParams.stream().anyMatch(sortParam::contains) &&
-                (sortParam.contains(ASC) || sortParam.contains(DESC));
     }
 
     @Transactional(rollbackFor = Exception.class)

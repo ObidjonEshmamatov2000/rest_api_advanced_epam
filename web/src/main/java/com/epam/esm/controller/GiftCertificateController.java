@@ -1,10 +1,12 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.hateos.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.common.BaseResponse;
+import com.epam.esm.dto.params.GiftCertificateParams;
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.dto.request.GiftCertificateRequestDto;
 import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
+import com.epam.esm.hateos.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.SUCCESS_MESSAGE;
 
 /**
  * @author Obidjon Eshmamatov
@@ -50,15 +50,11 @@ public class GiftCertificateController {
         @RequestParam(value = "pageSize", required = false) Integer pageSize,
         @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(NAME, name);
-        params.put(DESCRIPTION, description);
-        params.put(TAG_NAMES, tags);
-        params.put(SORT_PARAMS, sortParams);
-        params.put(PAGE_SIZE, pageSize);
-        params.put(PAGE_NUMBER, pageNumber);
+        PaginationParams paginationParams = new PaginationParams(pageSize, pageNumber);
+        GiftCertificateParams giftCertificateParams =
+                new GiftCertificateParams(name, description, tags, sortParams, paginationParams);
 
-        List<GiftCertificateEntity> entities = service.findAll(params);
+        List<GiftCertificateEntity> entities = service.findAllGiftCertificates(giftCertificateParams);
         BaseResponse success = new BaseResponse(
                 HttpStatus.OK.value(),
                 SUCCESS_MESSAGE,

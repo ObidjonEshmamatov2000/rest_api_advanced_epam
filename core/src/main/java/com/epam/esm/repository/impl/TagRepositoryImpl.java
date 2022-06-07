@@ -1,5 +1,7 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.dto.params.PaginationParams;
+import com.epam.esm.entity.GiftCertificateEntity;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.repository.TagRepository;
 import org.springframework.stereotype.Repository;
@@ -8,10 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.List;
-import java.util.Map;
-
-import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
-import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -29,14 +27,14 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<TagEntity> findAll(Map<String, Integer> paginationParam) {
+    public List<TagEntity> findAll(PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<TagEntity> cq = cb.createQuery(TagEntity.class);
         Root<TagEntity> entityRoot = cq.from(TagEntity.class);
         cq.select(entityRoot);
         return entityManager.createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
@@ -68,19 +66,16 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<TagEntity> findTagsByCertificateId(
-            Integer giftCertificateId,
-            Map<String, Integer> paginationParam
-    ) {
+    public List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<TagEntity> cq = cb.createQuery(TagEntity.class);
         Root<TagEntity> entityRoot = cq.from(TagEntity.class);
-        entityRoot.fetch("certificates", JoinType.LEFT);
-        cq.where(cb.equal(entityRoot.get("certificates").get("id"), giftCertificateId));
+        Join<GiftCertificateEntity, TagEntity> join = entityRoot.join("certificates");
+        cq.where(cb.equal(join.get("id"), giftCertificateId));
         return entityManager
                 .createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 

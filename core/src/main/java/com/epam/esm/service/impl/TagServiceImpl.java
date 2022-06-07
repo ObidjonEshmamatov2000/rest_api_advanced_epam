@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.TagParams;
 import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.exception.ApplicationDuplicateDataException;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.epam.esm.utils.ParamsStringProvider.*;
@@ -81,24 +81,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagEntity> findAll(Map<String, Object> params) {
-        List<TagEntity> all;
-        String name = (String) params.get(NAME);
-        Integer giftCertificateId = (Integer) params.get(CERTIFICATE_ID);
-        if (validator.isNameValid(name)) {
-            all = repository.findByName(name);
-        } else if (giftCertificateId != null && validator.isNumberValid(giftCertificateId)) {
-            all = repository.findTagsByCertificateId(
-                    giftCertificateId,
-                    paginationProvider.getPaginationParam(params)
-            );
-        } else {
-            all = repository.findAll(paginationProvider.getPaginationParam(params));
-        }
-        return all;
-    }
-
-    @Override
     public List<TagEntity> findTagsByName(String name) {
         return repository.findByName(name);
     }
@@ -106,5 +88,29 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders() {
         return repository.findMostUsedTagOfUserWithHighestCostOfOrders();
+    }
+
+    @Override
+    public List<TagEntity> findAllTags(TagParams tagParams) {
+        List<TagEntity> all;
+        if (tagParams.getName() != null) {
+            if (!validator.isNameValid(tagParams.getName())) {
+                throw new ApplicationNotValidDataException(NAME_NOT_VALID, tagParams.getName());
+            }
+            all = repository.findByName(tagParams.getName());
+        } else if (tagParams.getCertificateId() != null) {
+            if (!validator.isNumberValid(tagParams.getCertificateId())) {
+                throw new ApplicationNotValidDataException(ID_NOT_VALID, tagParams.getCertificateId());
+            }
+            all = repository.findTagsByCertificateId(
+                    tagParams.getCertificateId(),
+                    paginationProvider.getPaginationParams(tagParams.getPaginationParams())
+            );
+        } else {
+            all = repository.findAll(
+                    paginationProvider.getPaginationParams(tagParams.getPaginationParams())
+            );
+        }
+        return all;
     }
 }

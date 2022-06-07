@@ -1,5 +1,7 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.OrderParams;
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.dto.request.OrderRequestDto;
 import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.AppUserEntity;
@@ -21,11 +23,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.ID_NOT_VALID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -186,42 +186,33 @@ class OrderServiceImplTest {
     @Test
     void canFindAllWhenUserIdValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 15);
-        params.put(OFFSET, 1);
-        params.put(USER_ID, 1);
-        Integer userId = (Integer) params.get(USER_ID);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        OrderParams orderParams = new OrderParams(1, paginationParams);
 
-        Map<String, Integer> paginationParams = new HashMap<>();
-        paginationParams.put(LIMIT, 15);
-        paginationParams.put(OFFSET, 0);
+        PaginationParams pageParams = new PaginationParams(15, 0);
 
-        given(validator.isNumberValid(userId)).willReturn(true);
-        given(paginationProvider.getPaginationParam(params)).willReturn(paginationParams);
-        given(orderRepository.findAllOrdersByUserId(userId, paginationParams)).willReturn(orderEntities);
+
+        given(validator.isNumberValid(orderParams.getUserId())).willReturn(true);
+        given(paginationProvider.getPaginationParams(orderParams.getPaginationParams())).willReturn(pageParams);
+        given(orderRepository.findAllOrdersByUserId(orderParams.getUserId(), pageParams)).willReturn(orderEntities);
 
         //when
-        List<OrderEntity> all = underTest.findAll(params);
+        List<OrderEntity> all = underTest.findAllOrders(orderParams);
 
         //then
         assertThat(all).isEqualTo(orderEntities);
-        verify(orderRepository, times(1)).findAllOrdersByUserId(userId, paginationParams);
+        verify(orderRepository, times(1)).findAllOrdersByUserId(orderParams.getUserId(), pageParams);
     }
 
     @Test
     void willThrowErrorIfUserIdNotValidDuringFindingAll() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 15);
-        params.put(OFFSET, 1);
-        params.put(USER_ID, -12);
-        int userId = (int) params.get(USER_ID);
-
-        given(validator.isNumberValid(userId)).willReturn(false);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        OrderParams orderParams = new OrderParams(null, paginationParams);
 
         //when
         //then
-        assertThatThrownBy(() -> underTest.findAll(params))
+        assertThatThrownBy(() -> underTest.findAllOrders(orderParams))
                 .isInstanceOf(ApplicationNotValidDataException.class)
                 .hasMessageContaining(ID_NOT_VALID);
         verify(orderRepository, never()).findAllOrdersByUserId(any(), any());

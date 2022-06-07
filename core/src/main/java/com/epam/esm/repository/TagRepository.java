@@ -1,10 +1,9 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.TagEntity;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Obidjon Eshmamatov
@@ -14,7 +13,7 @@ import java.util.Map;
 public interface TagRepository extends CrudRepository<TagEntity, Long> {
     List<TagEntity> findByName(String name);
 
-    List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, Map<String, Integer> paginationParam);
+    List<TagEntity> findTagsByCertificateId(Integer giftCertificateId, PaginationParams paginationParams);
 
     List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders();
 }

@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.dto.params.PaginationParams;
 import com.epam.esm.entity.AppUserEntity;
 import com.epam.esm.repository.AppUserRepository;
 import org.springframework.stereotype.Repository;
@@ -11,10 +12,6 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Map;
-
-import static com.epam.esm.utils.ParamsStringProvider.LIMIT;
-import static com.epam.esm.utils.ParamsStringProvider.OFFSET;
 
 /**
  * @author Obidjon Eshmamatov
@@ -32,15 +29,15 @@ public class AppUserRepositoryImpl implements AppUserRepository {
     }
 
     @Override
-    public List<AppUserEntity> findAll(Map<String, Integer> paginationParam) {
+    public List<AppUserEntity> findAll(PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
         Root<AppUserEntity> appUserEntityRoot = cq.from(AppUserEntity.class);
         cq.select(appUserEntityRoot);
 
         return entityManager.createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
@@ -61,31 +58,31 @@ public class AppUserRepositoryImpl implements AppUserRepository {
     }
 
     @Override
-    public List<AppUserEntity> findAllUsersByName(String name, Map<String, Integer> paginationParam) {
+    public List<AppUserEntity> findAllUsersByName(String name, PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
         Root<AppUserEntity> entityRoot = cq.from(AppUserEntity.class);
         cq.select(entityRoot).where(cb.or(
-                                    cb.like(entityRoot.get("firstName"), "%" + name + "%"),
-                                    cb.like(entityRoot.get("lastName"), "%" + name + "%")
-                                ));
+                cb.like(entityRoot.get("firstName"), "%" + name + "%"),
+                cb.like(entityRoot.get("lastName"), "%" + name + "%")
+        ));
         return entityManager
                 .createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 
     @Override
-    public List<AppUserEntity> findAllUsersByEmail(String email, Map<String, Integer> paginationParam) {
+    public List<AppUserEntity> findAllUsersByEmail(String email, PaginationParams paginationParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<AppUserEntity> cq = cb.createQuery(AppUserEntity.class);
         Root<AppUserEntity> entityRoot = cq.from(AppUserEntity.class);
         cq.select(entityRoot).where(cb.like(entityRoot.get("email"), "%" + email + "%"));
         return entityManager
                 .createQuery(cq)
-                .setFirstResult(paginationParam.get(OFFSET))
-                .setMaxResults(paginationParam.get(LIMIT))
+                .setFirstResult(paginationParams.getPageNumber())
+                .setMaxResults(paginationParams.getPageSize())
                 .getResultList();
     }
 }

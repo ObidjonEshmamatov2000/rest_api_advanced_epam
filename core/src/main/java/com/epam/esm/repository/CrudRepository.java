@@ -1,7 +1,8 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.dto.params.PaginationParams;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Obidjon Eshmamatov
@@ -20,10 +21,10 @@ public interface CrudRepository<T, Id>{
 
     /**
      * Gets all existing entities with provided type and provided limit and offset.
-     * @param paginationParam limit and offset of entities
+     * @param paginationParams limit and offset of entities
      * @return list of entities
      */
-    List<T> findAll(Map<String, Integer> paginationParam);
+    List<T> findAll(PaginationParams paginationParams);
 
     /**
      * Gets entity with the provided id.

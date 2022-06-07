@@ -1,8 +1,11 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.params.OrderParams;
 import com.epam.esm.dto.request.OrderRequestDto;
 import com.epam.esm.dto.request.OrderResponseDto;
 import com.epam.esm.entity.OrderEntity;
+
+import java.util.List;
 
 /**
  * @author Obidjon Eshmamatov
@@ -11,4 +14,6 @@ import com.epam.esm.entity.OrderEntity;
  */
 public interface OrderService extends BaseService<OrderEntity, OrderRequestDto> {
     OrderResponseDto findSingleUserOrder(Integer userID, Integer orderId);
+
+    List<OrderEntity> findAllOrders(OrderParams orderParams);
 }

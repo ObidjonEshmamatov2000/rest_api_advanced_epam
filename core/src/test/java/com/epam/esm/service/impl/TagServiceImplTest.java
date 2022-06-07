@@ -1,5 +1,7 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.params.PaginationParams;
+import com.epam.esm.dto.params.TagParams;
 import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 import com.epam.esm.exception.ApplicationNotValidDataException;
@@ -15,11 +17,9 @@ import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.epam.esm.utils.ParamsStringProvider.*;
+import static com.epam.esm.utils.ParamsStringProvider.ID_NOT_VALID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -126,40 +126,39 @@ class TagServiceImplTest {
     @Test
     void canFindAllTagsWhenNameIsValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(LIMIT, 25);
-        params.put(OFFSET, 1);
-        params.put(NAME, "tag");
-        String name = (String) params.get(NAME);
-        given(validator.isNameValid(name)).willReturn(true);
-        given(tagRepository.findByName(name)).willReturn(tagEntities);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        TagParams tagParams = new TagParams("tag", null, paginationParams);
+
+        given(validator.isNameValid(tagParams.getName())).willReturn(true);
+        given(tagRepository.findByName(tagParams.getName())).willReturn(tagEntities);
 
         //when
-        List<TagEntity> tagsByName = underTest.findAll(params);
+        List<TagEntity> tagsByName = underTest.findAllTags(tagParams);
 
         //then
         assertThat(tagsByName).isEqualTo(tagEntities);
-        verify(tagRepository, times(1)).findByName(name);
+        verify(tagRepository, times(1)).findByName(tagParams.getName());
         verify(tagRepository, never()).findTagsByCertificateId(any(), any());
     }
 
     @Test
     void canFindAllTagsWhenNameIsNotValidGiftCertificateIdValid() {
         //given
-        Map<String, Object> params = new HashMap<>();
-        params.put(CERTIFICATE_ID, 11);
-        String name = (String) params.get(NAME);
-        Integer gift_certificate_id = (Integer) params.get(CERTIFICATE_ID);
-        given(validator.isNameValid(name)).willReturn(false);
-        given(validator.isNumberValid(gift_certificate_id)).willReturn(true);
-        given(tagRepository.findTagsByCertificateId(gift_certificate_id, new HashMap<>())).willReturn(tagEntities);
+        PaginationParams paginationParams = new PaginationParams(15, 1);
+        TagParams tagParams = new TagParams(null, 1002, paginationParams);
+
+        PaginationParams pageParams = new PaginationParams(15, 0);
+
+        given(validator.isNumberValid(tagParams.getCertificateId())).willReturn(true);
+        given(paginationProvider.getPaginationParams(tagParams.getPaginationParams())).willReturn(pageParams);
+        given(tagRepository.findTagsByCertificateId(tagParams.getCertificateId(), pageParams)).willReturn(tagEntities);
 
         //when
-        List<TagEntity> tagsByName = underTest.findAll(params);
+        List<TagEntity> tagsByName = underTest.findAllTags(tagParams);
 
         //then
         assertThat(tagsByName).isEqualTo(tagEntities);
-        verify(tagRepository, times(1)).findTagsByCertificateId(gift_certificate_id, new HashMap<>());
+        verify(tagRepository, times(1)).findTagsByCertificateId(tagParams.getCertificateId(), pageParams);
         verify(tagRepository, never()).findByName(any());
     }
 

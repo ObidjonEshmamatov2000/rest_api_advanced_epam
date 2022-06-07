@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.params.TagParams;
 import com.epam.esm.dto.request.TagRequestDto;
 import com.epam.esm.entity.TagEntity;
 
@@ -14,4 +15,6 @@ public interface TagService extends BaseService<TagEntity, TagRequestDto> {
     List<TagEntity> findTagsByName(String name);
 
     List<TagEntity> findMostUsedTagOfUserWithHighestCostOfOrders();
+
+    List<TagEntity> findAllTags(TagParams tagParams);
 }
